@@ -40,7 +40,7 @@ import
 * Performance
 
 ## Project Status
-Stable
+Before Pre-Alpha
 
 ## TODO
 * Create easy API access wrappers
