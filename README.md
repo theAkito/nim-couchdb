@@ -37,13 +37,15 @@ import
 * Linux
 
 ## Goals
-* Performance
+* Ease of Use
+* Comfortability
 
 ## Project Status
 Before Pre-Alpha
 
 ## TODO
 * Create easy API access wrappers
+* Wrap more complex processes
 * Improve usage explanations
 * Add native Documentation
 * Support Windows (?)
