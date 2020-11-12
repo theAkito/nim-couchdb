@@ -1,5 +1,5 @@
 #[
-  NimPackage: A new awesome Nim library.
+  couchdb: A new awesome Nim library.
 ]#
 
 when isMainModule:

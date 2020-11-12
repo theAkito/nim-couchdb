@@ -1,4 +1,4 @@
-[![nimble](https://raw.githubusercontent.com/yglukhov/nimble-tag/master/nimble.png)](https://nimble.directory/pkg/nimpackage)
+[![nimble](https://raw.githubusercontent.com/yglukhov/nimble-tag/master/nimble.png)](https://nimble.directory/pkg/couchdb)
 
 [![Language](https://img.shields.io/badge/language-Nim-orange.svg?style=plastic)](https://nim-lang.org/)
 
@@ -6,16 +6,35 @@
 [![Liberapay patrons](https://img.shields.io/liberapay/patrons/Akito?style=plastic)](https://liberapay.com/Akito/)
 
 ## What
-This is a base template for App projects written in Nim.
+Easily and comfortably access your CouchDB.
 
 ## Why
-Allows kickstarting new projects, without fiddling around with metadata basics.
+This is, at the time of writing, to my knowledge, the only published Nim module handling CouchDB access.
 
 ## How
-Select this is a template, when creating a new Git repository through a Git WebUI
+### Install
+```
+nimble install couchdb
+nimble intro
+```
+
+### Test
+```
+nimble test
+```
+
+### Use
+```nim
+import
+  couchdb,
+  os,
+  json
+
+#TODO
+```
 
 ## Where
-Git.
+* Linux
 
 ## Goals
 * Performance
@@ -24,7 +43,10 @@ Git.
 Stable
 
 ## TODO
-* Always improve
+* Create easy API access wrappers
+* Improve usage explanations
+* Add native Documentation
+* Support Windows (?)
 
 ## License
 Copyright (C) 2020  Akito <the@akito.ooo>
