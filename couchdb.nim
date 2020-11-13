@@ -5,6 +5,7 @@
 import
   httpclient,
   json,
+  options,
   tables
 include
   couchdb/meta
@@ -38,6 +39,9 @@ proc getDbAllDocs(http: HttpClient, db, url, req_kind: string): bool =
 
 proc getDbAllDesignDocs(http: HttpClient, db, url, req_kind: string): bool =
   http.reqGet(url & req_sep & db, req_db_design_docs)
+
+proc getDbBulkDocs(http: HttpClient, db, url, req_kind: string, docs: WantedDocuments): Documents =
+  http.reqPost(url & req_sep & db, req_db_bulk_get, $(%* docs))
 
 when isMainModule:
   echo "Greetings!"

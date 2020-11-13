@@ -1,12 +1,41 @@
 #[
   Meta: Global constants, etc.
 ]#
+import
+  options
 type
   CouchResponseHeaders {.used.} = object
     cache_control     : string
     content_length    : int
     eTag              : string
     transfer_encoding : string
+  WantedDocument       {.used.} = object
+    id                : string
+    rev               : string
+    atts_since        : string
+  WantedDocuments      {.used.} = object
+    docs              : openArray[WantedDocument]
+  DocRevisions         {.used.} = object
+    start             : int
+    ids               : openArray[string]
+  DocOk                {.used.} = object
+    id                : string
+    rev               : string
+    value             : string
+    revisions         : openArray[DocRevisions]
+  DocErr               {.used.} = object
+    id                : string
+    rev               : string
+    error             : string
+    reason            : string
+  DocumentResult       {.used.} = object
+    ok                : Option[DocOk]
+    error             : Option[DocErr]
+  DocumentResults      {.used.} = object
+    id                : string
+    docs              : openArray[DocumentResult]
+  Documents            {.used.} = object
+    docs              : openArray[DocumentResults]
 
 const
   name_db                 {.strdefine, used.} = "/db"
