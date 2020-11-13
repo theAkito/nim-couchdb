@@ -10,6 +10,22 @@ type
     content_length    : int
     eTag              : string
     transfer_encoding : string
+  Selector             {.used.} = object
+  NewIndex             {.used.} = object
+    index             : JsonNode
+    ddoc              : Option[string]
+    name              : Option[string]
+    ttype             : Option[string]
+    partial_filter_selector : Option[JsonNode]
+    partitioned       : Option[bool]
+  NewIndexResult       {.used.} = object
+    result            : string
+    id                : string
+    name              : string
+  ExplainIndexResult   {.used.} = object
+    db                : string
+    id                : string
+    name              : string
   UpdatedDocument      {.used.} = object
     ok                : Option[bool]
     id                : Option[string]
