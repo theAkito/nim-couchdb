@@ -2,6 +2,7 @@
   Meta: Global constants, etc.
 ]#
 import
+  json,
   options
 type
   CouchResponseHeaders {.used.} = object
@@ -9,10 +10,31 @@ type
     content_length    : int
     eTag              : string
     transfer_encoding : string
+  UpdatedDocument      {.used.} = object
+    ok                : Option[bool]
+    id                : Option[string]
+    rev               : Option[string]
+  SearchedDocument     {.used.} = object
+    selector          : JsonNode
+    limit             : Option[int]
+    skip              : Option[int]
+    sort              : Option[JArray]
+    use_index         : Option[JArray]
+    r                 : Option[int]
+    bookmark          : Option[string]
+    update            : Option[bool]
+    stable            : Option[bool]
+    execution_stats   : Option[bool]
+  FoundDocuments       {.used.} = object
+    docs              : seq[Option[JsonNode]]
+    warning           : Option[string]
+    execution_stats   : Option[bool]
+    bookmark          : Option[string]
   WantedDocument       {.used.} = object
-    id                : string
-    rev               : string
+    id                : Option[string]
+    rev               : Option[string]
     atts_since        : Option[string]
+    deleted           : Option[bool]
   WantedDocuments      {.used.} = object
     docs              : seq[WantedDocument]
   DocRevisions         {.used.} = object
@@ -21,7 +43,7 @@ type
   DocOk                {.used.} = object
     id                : string
     rev               : string
-    value             : Option[string]
+    value             : Option[JsonNode]
     revisions         : seq[DocRevisions]
   DocErr               {.used.} = object
     id                : string
