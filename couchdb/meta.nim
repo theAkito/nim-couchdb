@@ -1,6 +1,13 @@
 #[
   Meta: Global constants, etc.
 ]#
+type
+  CouchResponseHeaders {.used.} = object
+    cache_control     : string
+    content_length    : int
+    eTag              : string
+    transfer_encoding : string
+
 const
   name_db                 {.strdefine, used.} = "/db"
   resp_ok                            {.used.} = "200 - OK"
@@ -20,6 +27,7 @@ const
   resp_expectationFailed             {.used.} = "417 - Expectation Failed"
   resp_internalServerError           {.used.} = "500 - Internal Server Error"
   req_root                           {.used.} = "/"
+  req_sep                            {.used.} = req_root
   req_active_tasks                   {.used.} = "/_active_tasks"
   req_all_dbs                        {.used.} = "/_all_dbs"
   req_dbs_info                       {.used.} = "/_dbs_info"
