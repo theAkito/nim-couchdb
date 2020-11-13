@@ -12,30 +12,30 @@ type
   WantedDocument       {.used.} = object
     id                : string
     rev               : string
-    atts_since        : string
+    atts_since        : Option[string]
   WantedDocuments      {.used.} = object
-    docs              : openArray[WantedDocument]
+    docs              : seq[WantedDocument]
   DocRevisions         {.used.} = object
     start             : int
-    ids               : openArray[string]
+    ids               : seq[string]
   DocOk                {.used.} = object
     id                : string
     rev               : string
-    value             : string
-    revisions         : openArray[DocRevisions]
+    value             : Option[string]
+    revisions         : seq[DocRevisions]
   DocErr               {.used.} = object
     id                : string
     rev               : string
     error             : string
     reason            : string
-  DocumentResult       {.used.} = object
+  DocumentEntity       {.used.} = object
     ok                : Option[DocOk]
     error             : Option[DocErr]
-  DocumentResults      {.used.} = object
+  DocumentResult       {.used.} = object
     id                : string
-    docs              : openArray[DocumentResult]
-  Documents            {.used.} = object
-    docs              : openArray[DocumentResults]
+    docs              : seq[DocumentEntity]
+  DocumentResults      {.used.} = object
+    results           : seq[DocumentResult]
 
 const
   name_db                 {.strdefine, used.} = "/db"
