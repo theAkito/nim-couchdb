@@ -3,6 +3,7 @@
 ]#
 import
   json,
+  tables,
   strtabs
 type
   CouchResponseHeaders {.used.} = object
@@ -18,8 +19,17 @@ type
     ttype             : string
     partial_filter_se : JsonNode
     partitioned       : bool
-  PurgeRequest         {.used.} = object
-    documentSpec      : StringTableRef
+  PurgedInfosLimit     {.used.} = distinct int
+  DocumentMiniSpec     {.used.} = distinct StringTableRef
+  MissingRevs          {.used.} = distinct StringTableRef
+  RevsDiff             {.used.} = object
+    missing           : seq[string]
+    possible_ancestors: seq[string]
+  RevsDiffResponse     {.used.} = object
+    revsDiffs         : Table[string, seq[RevsDiff]]
+  PurgeResponse        {.used.} = object
+    purge_seq         : string
+    purged            : seq[DocumentMiniSpec]
   Users                {.used.} = object of RootObj
     names             : seq[string]
     roles             : seq[string]
