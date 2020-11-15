@@ -5,6 +5,7 @@ import
   json,
   tables,
   strtabs
+
 type
   CouchResponseHeaders {.used.} = object
     cache_control     : string
