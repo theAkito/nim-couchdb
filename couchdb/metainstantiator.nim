@@ -8,89 +8,104 @@ import
 include
   meta
 
-proc parseCouchResponseHeaders*(jtext: string): CouchResponseHeaders =
-  jtext.parseJson.to(CouchResponseHeaders)
+proc parseCouchResponseHeaders*(raw_text: string): CouchResponseHeaders =
+  raw_text.parseJson.to(CouchResponseHeaders)
 
-proc parseNewIndex*(jtext: string): NewIndex =
-  jtext.parseJson.to(NewIndex)
+proc parseNewIndex*(raw_text: string): NewIndex =
+  raw_text.parseJson.to(NewIndex)
 
-proc parseRevsDiff*(jtext: string): RevsDiff =
-  jtext.parseJson.to(RevsDiff)
+proc parseRevsDiff*(raw_text: string): RevsDiff =
+  raw_text.parseJson.to(RevsDiff)
 
-proc parseRevsDiffResponse*(jtext: string): RevsDiffResponse =
-  jtext.parseJson.to(RevsDiffResponse)
+proc parseRevsDiffResponse*(raw_text: string): RevsDiffResponse =
+  raw_text.parseJson.to(RevsDiffResponse)
 
-proc parsePurgeResponse*(jtext: string): PurgeResponse =
-  jtext.parseJson.to(PurgeResponse)
+proc parsePurgeResponse*(raw_text: string): PurgeResponse =
+  raw_text.parseJson.to(PurgeResponse)
 
-proc parseAdmins*(jtext: string): Admins =
-  jtext.parseJson.to(Admins)
+proc parseAdmins*(raw_text: string): Admins =
+  raw_text.parseJson.to(Admins)
 
-proc parseMembers*(jtext: string): Members =
-  jtext.parseJson.to(Members)
+proc parseMembers*(raw_text: string): Members =
+  raw_text.parseJson.to(Members)
 
-proc parseNewIndexResult*(jtext: string): NewIndexResult =
-  jtext.parseJson.to(NewIndexResult)
+proc parseNewIndexResult*(raw_text: string): NewIndexResult =
+  raw_text.parseJson.to(NewIndexResult)
 
-proc parseSimpleConfirmation*(jtext: string): SimpleConfirmation =
-  jtext.parseJson.to(SimpleConfirmation)
+proc parseSimpleConfirmation*(raw_text: string): SimpleConfirmation =
+  raw_text.parseJson.to(SimpleConfirmation)
 
-proc parseDocChangesResponse*(jtext: string): DocChangesResponse =
-  jtext.parseJson.to(DocChangesResponse)
+proc parseDocChangesResponse*(raw_text: string): DocChangesResponse =
+  raw_text.parseJson.to(DocChangesResponse)
 
-proc parseDocChangesQuery*(jtext: string): DocChangesQuery =
-  jtext.parseJson.to(DocChangesQuery)
+proc parseDocChangesQuery*(raw_text: string): DocChangesQuery =
+  raw_text.parseJson.to(DocChangesQuery)
 
-proc parseSyncShardsResponse*(jtext: string): SyncShardsResponse =
-  jtext.parseJson.to(SyncShardsResponse)
+proc parseSyncShardsResponse*(raw_text: string): SyncShardsResponse =
+  raw_text.parseJson.to(SyncShardsResponse)
 
-proc parseDocShardResponse*(jtext: string): DocShardResponse =
-  jtext.parseJson.to(DocShardResponse)
+proc parseDocShardResponse*(raw_text: string): DocShardResponse =
+  raw_text.parseJson.to(DocShardResponse)
 
-proc parseDatabaseShards*(jtext: string): DatabaseShards =
-  jtext.parseJson.to(DatabaseShards)
+proc parseDatabaseShards*(raw_text: string): DatabaseShards =
+  raw_text.parseJson.to(DatabaseShards)
 
-proc parseExplainIndexResult*(jtext: string): ExplainIndexResult =
-  jtext.parseJson.to(ExplainIndexResult)
+proc parseExplainIndexResult*(raw_text: string): ExplainIndexResult =
+  raw_text.parseJson.to(ExplainIndexResult)
 
-proc parseUpdatedDocument*(jtext: string): UpdatedDocument =
-  jtext.parseJson.to(UpdatedDocument)
+proc parseUpdatedDocument*(raw_text: string): UpdatedDocument =
+  raw_text.parseJson.to(UpdatedDocument)
 
-proc parseSearchedEntity*(jtext: string): SearchedEntity =
-  jtext.parseJson.to(SearchedEntity)
+proc parseSearchedEntity*(raw_text: string): SearchedEntity =
+  raw_text.parseJson.to(SearchedEntity)
 
-proc parseFoundDocuments*(jtext: string): FoundDocuments =
-  jtext.parseJson.to(FoundDocuments)
+proc parseFoundDocuments*(raw_text: string): FoundDocuments =
+  raw_text.parseJson.to(FoundDocuments)
 
-proc parseWantedDocument*(jtext: string): WantedDocument =
-  jtext.parseJson.to(WantedDocument)
+proc parseWantedDocument*(raw_text: string): WantedDocument =
+  raw_text.parseJson.to(WantedDocument)
 
-proc parseWantedDocuments*(jtext: string): WantedDocuments =
-  jtext.parseJson.to(WantedDocuments)
+proc parseWantedDocuments*(raw_text: string): WantedDocuments =
+  raw_text.parseJson.to(WantedDocuments)
 
-proc parseDocRevisions*(jtext: string): DocRevisions =
-  jtext.parseJson.to(DocRevisions)
+proc parseDocRevisions*(raw_text: string): DocRevisions =
+  raw_text.parseJson.to(DocRevisions)
 
-proc parseDocOk*(jtext: string): DocOk =
-  jtext.parseJson.to(DocOk)
+proc parseDocOk*(raw_text: string): DocOk =
+  raw_text.parseJson.to(DocOk)
 
-proc parseDocErr*(jtext: string): DocErr =
-  jtext.parseJson.to(DocErr)
+proc parseDocErr*(raw_text: string): DocErr =
+  raw_text.parseJson.to(DocErr)
 
-proc parseDocumentEntity*(jtext: string): DocumentEntity =
-  jtext.parseJson.to(DocumentEntity)
+proc parseDocumentEntity*(raw_text: string): DocumentEntity =
+  raw_text.parseJson.to(DocumentEntity)
 
-proc parseDocumentResult*(jtext: string): DocumentResult =
+proc parseDocumentResult*(raw_text: string): DocumentResult =
   # /{db}/_bulk_get
-  # jtext.parseJson.to(DocumentResult)
   let
-    text = try: jtext.parseJson() except: nil
-  if text.kind == JNull: return DocumentResult()
-  if text["docs"].elems[0].fields.hasKey("ok"):
+    jtext = try: raw_text.parseJson() except: nil
+  if jtext.kind == JNull: return DocumentResult()
+  if jtext["docs"].elems[0].fields.hasKey("ok"):
+    let
+      doc = jtext["docs"].elems[0].fields["ok"]
+      docOk = DocOk(
+        id: doc["_id"].getStr(),
+        rev: doc["_rev"].getStr(),
+        value: doc["value"],
+      )
+      docEntity = DocumentEntity(
+        state: ok,
+        ok: docOk
+      )
+    result = DocumentResult(
+      id: jtext["id"].getStr(),
+      docs: @[docEntity]
+    )
+  elif jtext["docs"].elems[0].fields.hasKey("error"):
     discard
-  elif text["docs"].elems[0].fields.hasKey("error"):
-    discard
+  else:
+    return DocumentResult()
 
-proc parseDocumentResults*(jtext: string): DocumentResults =
+proc parseDocumentResults*(raw_text: string): DocumentResults =
   # /{db}/_bulk_get
-  jtext.parseJson.to(DocumentResults)
+  raw_text.parseJson.to(DocumentResults)
