@@ -7,6 +7,8 @@ import
   strtabs
 
 type
+  DocumentEntityState  {.used.} = enum
+    ok, error
   CouchResponseHeaders {.used.} = object
     cache_control     : string
     content_length    : int
@@ -106,12 +108,13 @@ type
     warning           : string
     execution_stats   : bool
     bookmark          : string
-  WantedDocument       {.used.} = object
+  WantedDocument       {.used.} = object of RootObj
+    # /{db}/_bulk_get
     id                : string
     rev               : string
     atts_since        : string
-    deleted           : bool
   WantedDocuments      {.used.} = object
+    # /{db}/_bulk_get
     docs              : seq[WantedDocument]
   DocRevisions         {.used.} = object
     start             : int
@@ -127,13 +130,16 @@ type
     error             : string
     reason            : string
   DocumentEntity       {.used.} = object
-    ok                : DocOk
-    error             : DocErr
+    case state: DocumentEntityState:
+      of ok:
+        ok            : DocOk
+      of error:
+        error         : DocErr
   DocumentResult       {.used.} = object
+    # /{db}/_bulk_get
     id                : string
     docs              : seq[DocumentEntity]
-  DocumentResults      {.used.} = object
-    results           : seq[DocumentResult]
+  DocumentResults      {.used.} = distinct seq[DocumentResult]
 
 const
   name_db                 {.strdefine, used.} = "/db"

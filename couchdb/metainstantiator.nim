@@ -81,7 +81,16 @@ proc parseDocumentEntity*(jtext: string): DocumentEntity =
   jtext.parseJson.to(DocumentEntity)
 
 proc parseDocumentResult*(jtext: string): DocumentResult =
-  jtext.parseJson.to(DocumentResult)
+  # /{db}/_bulk_get
+  # jtext.parseJson.to(DocumentResult)
+  let
+    text = try: jtext.parseJson() except: nil
+  if text.kind == JNull: return DocumentResult()
+  if text["docs"].elems[0].fields.hasKey("ok"):
+    discard
+  elif text["docs"].elems[0].fields.hasKey("error"):
+    discard
 
 proc parseDocumentResults*(jtext: string): DocumentResults =
+  # /{db}/_bulk_get
   jtext.parseJson.to(DocumentResults)
