@@ -89,20 +89,35 @@ proc parseDocumentResult*(raw_text: string): DocumentResult =
     let
       doc = jtext["docs"].elems[0].fields["ok"]
       docOk = DocOk(
-        id: doc["_id"].getStr(),
-        rev: doc["_rev"].getStr(),
-        value: doc["value"],
+        id    : doc["_id"].getStr(),
+        rev   : doc["_rev"].getStr(),
+        value : doc["value"]
       )
       docEntity = DocumentEntity(
-        state: ok,
-        ok: docOk
+        state : ok,
+        ok    : docOk
       )
     result = DocumentResult(
-      id: jtext["id"].getStr(),
-      docs: @[docEntity]
+      id      : jtext["id"].getStr(),
+      docs    : @[docEntity]
     )
   elif jtext["docs"].elems[0].fields.hasKey("error"):
-    discard
+    let
+      doc = jtext["docs"].elems[0].fields["error"]
+      docErr = DocErr(
+        id     : doc["id"].getStr(),
+        rev    : doc["rev"].getStr(),
+        error  : doc["error"].getStr(),
+        reason : doc["reason"].getStr()
+      )
+      docEntity = DocumentEntity(
+        state  : error,
+        error  : docErr
+      )
+    result = DocumentResult(
+      id       : jtext["id"].getStr(),
+      docs     : @[docEntity]
+    )
   else:
     return DocumentResult()
 
