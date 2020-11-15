@@ -123,7 +123,7 @@ type
     id                : string
     rev               : string
     value             : JsonNode
-    revisions         : seq[DocRevisions]
+    revisions         : DocRevisions
   DocErr               {.used.} = object
     id                : string
     rev               : string

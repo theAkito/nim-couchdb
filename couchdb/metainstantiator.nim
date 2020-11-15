@@ -2,6 +2,7 @@
   MetaInstantiator: Create, Construct, Delete, Destroy, Convert, Transform & Manage Meta constructions.
 ]#
 import
+  sequtils,
   json,
   tables,
   strtabs
@@ -90,10 +91,15 @@ proc parseDocumentResult*(jtext: JsonNode): DocumentResult =
   if jtext["docs"].elems[0].fields.hasKey("ok"):
     let
       doc = jtext["docs"].elems[0].fields["ok"]
+      docRevisions = DocRevisions(
+        start : doc["_revisions"].fields["start"].getInt(),
+        ids   : doc["_revisions"].fields["ids"].elems.mapIt(it.getStr())
+      )
       docOk = DocOk(
         id    : doc["_id"].getStr(),
         rev   : doc["_rev"].getStr(),
-        value : doc["value"]
+        value : doc["value"],
+        revisions: docRevisions
       )
       docEntity = DocumentEntity(
         state : ok,
