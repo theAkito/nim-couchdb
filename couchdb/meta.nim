@@ -88,9 +88,15 @@ type
     fields            : seq[string]
     rrange            : JsonNode
   UpdatedDocument      {.used.} = object
-    ok                : bool
+    # /{db}/_bulk_docs
     id                : string
-    rev               : string
+    case ok: bool:
+      of true:
+        rev           : string
+      of false:
+        error         : string
+        reason        : string
+
   SearchedEntity       {.used.} = object
     selector          : JsonNode
     limit             : int
@@ -140,6 +146,19 @@ type
     id                : string
     docs              : seq[DocumentEntity]
   DocumentResults      {.used.} = distinct seq[DocumentResult]
+
+when isMainModule:
+  echo UpdatedDocument(
+    id : "1111asdasd",
+    ok : false,
+    error : "111error",
+    reason : "111reason"
+  )
+  echo UpdatedDocument(
+    id : "1111asdasd",
+    ok : true,
+    rev : "111rev"
+  )
 
 const
   name_db                 {.strdefine, used.} = "/db"

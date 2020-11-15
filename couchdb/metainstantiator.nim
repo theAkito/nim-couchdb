@@ -58,8 +58,37 @@ proc parseDatabaseShards*(raw_text: string): DatabaseShards =
 proc parseExplainIndexResult*(raw_text: string): ExplainIndexResult =
   raw_text.parseJson.to(ExplainIndexResult)
 
-proc parseUpdatedDocument*(raw_text: string): UpdatedDocument =
-  raw_text.parseJson.to(UpdatedDocument)
+proc extractUpdatedDocuments*(jtext: JsonNode): seq[UpdatedDocument] =
+  # /{db}/_bulk_docs
+  if jtext.kind == JNull: return @[]
+  for doc in jtext.elems:
+    var upDocOk: bool
+    try:
+      upDocOk = doc["ok"].getBool()
+    except:
+      return @[UpdatedDocument()]
+    if upDocOk:
+      result.add(
+        UpdatedDocument(
+          ok      : true, # Explicitly not using var, to prevent compilation error.
+          id      : doc["id"].getStr(),
+          rev     : doc.getOrDefault("rev").getStr()
+        )
+      )
+    elif not upDocOk:
+      result.add(
+        UpdatedDocument(
+          ok      : false, # Explicitly not using var, to prevent compilation error.
+          id      : doc["id"].getStr(),
+          error   : doc.getOrDefault("error").getStr(),
+          reason  : doc.getOrDefault("reason").getStr()
+        )
+      )
+
+proc parseUpdatedDocuments*(raw_text: string): seq[UpdatedDocument] =
+  # /{db}/_bulk_docs
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractUpdatedDocuments(jtext)
 
 proc parseSearchedEntity*(raw_text: string): SearchedEntity =
   raw_text.parseJson.to(SearchedEntity)
@@ -85,7 +114,7 @@ proc parseDocErr*(raw_text: string): DocErr =
 proc parseDocumentEntity*(raw_text: string): DocumentEntity =
   raw_text.parseJson.to(DocumentEntity)
 
-proc parseDocumentResult*(jtext: JsonNode): DocumentResult =
+func extractDocumentResult*(jtext: JsonNode): DocumentResult =
   # /{db}/_bulk_get
   if jtext.kind == JNull: return DocumentResult()
   if jtext["docs"].elems[0].fields.hasKey("ok"):
@@ -130,10 +159,11 @@ proc parseDocumentResult*(jtext: JsonNode): DocumentResult =
     return DocumentResult()
 
 proc parseDocumentResult*(raw_text: string): DocumentResult =
+  # /{db}/_bulk_get
   let jtext = try: raw_text.parseJson() except: nil
-  result = parseDocumentResult(jtext)
+  result = extractDocumentResult(jtext)
 
 proc parseDocumentResults*(raw_text: string): DocumentResults =
   # /{db}/_bulk_get
   for res in raw_text.parseJson().elems:
-    result = result & parseDocumentResult(res)
+    result = result & extractDocumentResult(res)
