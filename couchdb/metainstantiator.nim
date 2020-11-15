@@ -8,6 +8,10 @@ import
 include
   meta
 
+func `&`(collection: DocumentResults, item: DocumentResult): DocumentResults =
+  # Putting into `metacompat.nim` and exporting does not work.
+  result = DocumentResults(cast[seq[DocumentResult]](collection) & item)
+
 proc parseCouchResponseHeaders*(raw_text: string): CouchResponseHeaders =
   raw_text.parseJson.to(CouchResponseHeaders)
 
@@ -80,10 +84,8 @@ proc parseDocErr*(raw_text: string): DocErr =
 proc parseDocumentEntity*(raw_text: string): DocumentEntity =
   raw_text.parseJson.to(DocumentEntity)
 
-proc parseDocumentResult*(raw_text: string): DocumentResult =
+proc parseDocumentResult*(jtext: JsonNode): DocumentResult =
   # /{db}/_bulk_get
-  let
-    jtext = try: raw_text.parseJson() except: nil
   if jtext.kind == JNull: return DocumentResult()
   if jtext["docs"].elems[0].fields.hasKey("ok"):
     let
@@ -121,6 +123,11 @@ proc parseDocumentResult*(raw_text: string): DocumentResult =
   else:
     return DocumentResult()
 
+proc parseDocumentResult*(raw_text: string): DocumentResult =
+  let jtext = try: raw_text.parseJson() except: nil
+  result = parseDocumentResult(jtext)
+
 proc parseDocumentResults*(raw_text: string): DocumentResults =
   # /{db}/_bulk_get
-  raw_text.parseJson.to(DocumentResults)
+  for res in raw_text.parseJson().elems:
+    result = result & parseDocumentResult(res)

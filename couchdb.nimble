@@ -31,14 +31,14 @@ task fbuild, "Build project.":
             --define:danger \
             --opt:speed \
             --out:couchdb \
-            src/couchdb
+            couchdb
        """
 task dbuild, "Debug Build project.":
   exec """nim c \
             --define:debug:true \
             --debuginfo:on \
             --out:couchdb \
-            src/couchdb
+            couchdb
        """
 task makecfg, "Create nim.cfg for optimized builds.":
   exec "nim tasks/cfg_optimized.nims"
