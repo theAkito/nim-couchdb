@@ -20,6 +20,7 @@ type
     partial_filter_se : JsonNode
     partitioned       : bool
   PurgedInfosLimit     {.used.} = distinct int
+  RevsLimit            {.used.} = distinct int
   DocumentMiniSpec     {.used.} = distinct StringTableRef
   MissingRevs          {.used.} = distinct StringTableRef
   RevsDiff             {.used.} = object
