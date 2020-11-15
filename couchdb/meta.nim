@@ -3,7 +3,7 @@
 ]#
 import
   json,
-  options
+  strtabs
 type
   CouchResponseHeaders {.used.} = object
     cache_control     : string
@@ -13,44 +13,92 @@ type
   Selector             {.used.} = object
   NewIndex             {.used.} = object
     index             : JsonNode
-    ddoc              : Option[string]
-    name              : Option[string]
-    ttype             : Option[string]
-    partial_filter_selector : Option[JsonNode]
-    partitioned       : Option[bool]
+    ddoc              : string
+    name              : string
+    ttype             : string
+    partial_filter_se : JsonNode
+    partitioned       : bool
+  PurgeRequest         {.used.} = object
+    documentSpec      : StringTableRef
+  Users                {.used.} = object of RootObj
+    names             : seq[string]
+    roles             : seq[string]
+  Admins               {.used.} = ref object of Users
+  Members              {.used.} = ref object of Users
   NewIndexResult       {.used.} = object
     result            : string
     id                : string
     name              : string
+  SimpleConfirmation   {.used.} = object
+    ok                : bool
+  DocChangesResponse   {.used.} = object
+    last_seq          : string
+    pending           : int
+    results           : seq[JsonNode]
+  DocChangesQuery      {.used.} = object
+    doc_ids           : seq[string]
+    conflicts         : bool
+    descending        : bool
+    feed              : string
+    filter            : string
+    heartbeat         : int
+    include_docs      : bool
+    attachments       : bool
+    att_encoding_info : bool
+    last_event_id     : int
+    limit             : int
+    since             : string
+    style             : string
+    timeout           : int
+    view              : string
+    seq_interval      : int
+    reason            : seq[string]
+    nodes             : seq[string]
+  SyncShardsResponse   {.used.} = object
+    ok                : bool
+    error             : seq[string]
+    reason            : seq[string]
+    nodes             : seq[string]
+  DocShardResponse     {.used.} = object
+    rrange            : string
+    nodes             : seq[string]
+  DatabaseShards       {.used.} = object
+    shards            : JsonNode
   ExplainIndexResult   {.used.} = object
-    db                : string
-    id                : string
-    name              : string
-  UpdatedDocument      {.used.} = object
-    ok                : Option[bool]
-    id                : Option[string]
-    rev               : Option[string]
-  SearchedDocument     {.used.} = object
+    dbname            : string
+    index             : JsonNode
     selector          : JsonNode
-    limit             : Option[int]
-    skip              : Option[int]
-    sort              : Option[JArray]
-    use_index         : Option[JArray]
-    r                 : Option[int]
-    bookmark          : Option[string]
-    update            : Option[bool]
-    stable            : Option[bool]
-    execution_stats   : Option[bool]
+    opts              : JsonNode
+    limit             : int
+    skip              : int
+    fields            : seq[string]
+    rrange            : JsonNode
+  UpdatedDocument      {.used.} = object
+    ok                : bool
+    id                : string
+    rev               : string
+  SearchedEntity       {.used.} = object
+    selector          : JsonNode
+    limit             : int
+    skip              : int
+    sort              : seq[string]
+    fields            : seq[string]
+    use_index         : seq[string]
+    r                 : int
+    bookmark          : string
+    update            : bool
+    stable            : bool
+    execution_stats   : bool
   FoundDocuments       {.used.} = object
-    docs              : seq[Option[JsonNode]]
-    warning           : Option[string]
-    execution_stats   : Option[bool]
-    bookmark          : Option[string]
+    docs              : seq[JsonNode]
+    warning           : string
+    execution_stats   : bool
+    bookmark          : string
   WantedDocument       {.used.} = object
-    id                : Option[string]
-    rev               : Option[string]
-    atts_since        : Option[string]
-    deleted           : Option[bool]
+    id                : string
+    rev               : string
+    atts_since        : string
+    deleted           : bool
   WantedDocuments      {.used.} = object
     docs              : seq[WantedDocument]
   DocRevisions         {.used.} = object
@@ -59,7 +107,7 @@ type
   DocOk                {.used.} = object
     id                : string
     rev               : string
-    value             : Option[JsonNode]
+    value             : JsonNode
     revisions         : seq[DocRevisions]
   DocErr               {.used.} = object
     id                : string
@@ -67,8 +115,8 @@ type
     error             : string
     reason            : string
   DocumentEntity       {.used.} = object
-    ok                : Option[DocOk]
-    error             : Option[DocErr]
+    ok                : DocOk
+    error             : DocErr
   DocumentResult       {.used.} = object
     id                : string
     docs              : seq[DocumentEntity]
