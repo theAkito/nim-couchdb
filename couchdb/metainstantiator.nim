@@ -5,7 +5,8 @@ import
   sequtils,
   json,
   tables,
-  strtabs
+  strtabs,
+  segfaults
 include
   meta
 
@@ -65,8 +66,10 @@ proc extractUpdatedDocuments*(jtext: JsonNode): seq[UpdatedDocument] =
     var upDocOk: bool
     try:
       upDocOk = doc["ok"].getBool()
+    except KeyError:
+      return @[]
     except:
-      return @[UpdatedDocument()]
+      echo getCurrentExceptionMsg()
     if upDocOk:
       result.add(
         UpdatedDocument(
@@ -93,8 +96,12 @@ proc parseUpdatedDocuments*(raw_text: string): seq[UpdatedDocument] =
 proc parseSearchedEntity*(raw_text: string): SearchedEntity =
   raw_text.parseJson.to(SearchedEntity)
 
+proc extractFoundDocuments*(jtext: JsonNode): FoundDocuments =
+  if jtext.kind == JNull: return FoundDocuments()
+
 proc parseFoundDocuments*(raw_text: string): FoundDocuments =
-  raw_text.parseJson.to(FoundDocuments)
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractFoundDocuments(jtext)
 
 proc parseWantedDocument*(raw_text: string): WantedDocument =
   raw_text.parseJson.to(WantedDocument)
