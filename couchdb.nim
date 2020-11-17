@@ -40,7 +40,7 @@ proc getDbAllDocs(http: HttpClient, db, url, req_kind: string): bool =
 proc getDbAllDesignDocs(http: HttpClient, db, url, req_kind: string): bool =
   http.reqGet(url & req_sep & db, req_db_design_docs)
 
-proc getDbBulkDocs(http: HttpClient, db, url, req_kind: string, docs: WantedDocuments): Documents =
+proc getDbBulkDocs(http: HttpClient, db, url, req_kind: string, docs: WantedDocuments): bool =
   http.reqPost(url & req_sep & db, req_db_bulk_get, $(%* docs))
 
 when isMainModule:

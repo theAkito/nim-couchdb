@@ -20,3 +20,4 @@ htmldocs/
 # Binaries and Temp Files
 *.exe
 "couchdb"
+couchdb.out

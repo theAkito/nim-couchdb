@@ -17,9 +17,6 @@ func `&`(collection: DocumentResults, item: DocumentResult): DocumentResults =
 proc parseCouchResponseHeaders*(raw_text: string): CouchResponseHeaders =
   raw_text.parseJson.to(CouchResponseHeaders)
 
-proc parseNewIndex*(raw_text: string): NewIndex =
-  raw_text.parseJson.to(NewIndex)
-
 proc parseRevsDiff*(raw_text: string): RevsDiff =
   raw_text.parseJson.to(RevsDiff)
 
@@ -35,8 +32,17 @@ proc parseAdmins*(raw_text: string): Admins =
 proc parseMembers*(raw_text: string): Members =
   raw_text.parseJson.to(Members)
 
+proc extractNewIndexResult*(jtext: JsonNode): NewIndexResult =
+  if jtext.kind == JNull: return NewIndexResult()
+  result = try: NewIndexResult(
+    result : jtext["result"].getStr(),
+    id     : jtext["id"].getStr(),
+    name   : jtext["name"].getStr()
+  ) except: NewIndexResult()
+
 proc parseNewIndexResult*(raw_text: string): NewIndexResult =
-  raw_text.parseJson.to(NewIndexResult)
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractNewIndexResult(jtext)
 
 proc parseSimpleConfirmation*(raw_text: string): SimpleConfirmation =
   raw_text.parseJson.to(SimpleConfirmation)
