@@ -109,10 +109,16 @@ type
     update            : bool
     stable            : bool
     execution_stats   : bool
+  ExecutionStats       {.used.} = object
+    total_keys_examined : int
+    total_docs_examined : int
+    total_quorum_docs_examined : int
+    results_returned    : int
+    execution_time_ms   : float
   FoundDocuments       {.used.} = object
     docs              : seq[JsonNode]
     warning           : string
-    execution_stats   : bool
+    execution_stats   : ExecutionStats
     bookmark          : string
   WantedDocument       {.used.} = object of RootObj
     # /{db}/_bulk_get

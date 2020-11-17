@@ -98,8 +98,24 @@ proc parseSearchedEntity*(raw_text: string): SearchedEntity =
 
 proc extractFoundDocuments*(jtext: JsonNode): FoundDocuments =
   if jtext.kind == JNull: return FoundDocuments()
+  let
+    docs = try: jtext["docs"].elems except: @[]
+    jexec_stats = try: jtext["execution_stats"].fields except: {"": JsonNode()}.toOrderedTable()
+    exec_stats = try: ExecutionStats(
+      total_keys_examined        : jexec_stats["total_keys_examined"].getInt(),
+      total_docs_examined        : jexec_stats["total_docs_examined"].getInt(),
+      total_quorum_docs_examined : jexec_stats["total_quorum_docs_examined"].getInt(),
+      results_returned           : jexec_stats["results_returned"].getInt(),
+      execution_time_ms          : jexec_stats["execution_time_ms"].getFloat()
+    ) except: ExecutionStats()
+  result = FoundDocuments(
+    docs              : docs,
+    warning           : jtext.getOrDefault("warning").getStr(">>none<<"),
+    execution_stats   : exec_stats,
+    bookmark          : jtext.getOrDefault("bookmark").getStr(">>none<<")
+  )
 
-proc parseFoundDocuments*(raw_text: string): FoundDocuments =
+proc parseFoundDocuments*(raw_text: string, fields: seq[string]): FoundDocuments =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractFoundDocuments(jtext)
 
