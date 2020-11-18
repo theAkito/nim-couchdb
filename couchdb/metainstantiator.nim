@@ -34,7 +34,7 @@ proc parseMembers*(raw_text: string): Members =
 
 proc extractNewIndexResult*(jtext: JsonNode): NewIndexResult =
   # /db/_index
-  if jtext.kind == JNull: return NewIndexResult()
+  if jtext.isNil: return NewIndexResult()
   result = try: NewIndexResult(
     result : jtext["result"].getStr(),
     id     : jtext["id"].getStr(),
@@ -46,14 +46,45 @@ proc parseNewIndexResult*(raw_text: string): NewIndexResult =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractNewIndexResult(jtext)
 
+proc extractUsers*(jtext: JsonNode): (Admins, Members) =
+  # /{db}/_security
+  if jtext.isNil: return (Admins(), Members())
+  let
+    admin_fields  = jtext.getOrDefault("admins").getFields()
+    member_fields = jtext.getOrDefault("member").getFields()
+    admin_names   = admin_fields.getOrDefault("names").getElems()
+    member_names  = member_fields.getOrDefault("names").getElems()
+    admin_roles   = admin_fields.getOrDefault("roles").getElems()
+    member_roles  = member_fields.getOrDefault("roles").getElems()
+  result = (
+    Admins(
+      names : admin_names.mapIt(it.getStr),
+      roles : admin_roles.mapIt(it.getStr)
+    ),
+    Members(
+      names : member_names.mapIt(it.getStr),
+      roles : member_roles.mapIt(it.getStr)
+    )
+  )
+
+proc parseUsers*(raw_text: string): (Admins, Members) =
+  # /{db}/_security
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractUsers(jtext)
+
 proc extractSimpleConfirmation*(jtext: JsonNode): SimpleConfirmation =
-  if jtext.kind == JNull: return SimpleConfirmation()
+  # /db/_compact
+  # /db/_compact/design-doc
+  # /db/_view_cleanup
+  if jtext.isNil: return SimpleConfirmation()
   result = try: SimpleConfirmation(
     ok : jtext["ok"].getBool
   ) except: SimpleConfirmation()
 
 proc parseSimpleConfirmation*(raw_text: string): SimpleConfirmation =
   # /db/_compact
+  # /db/_compact/design-doc
+  # /db/_view_cleanup
   # Response Header validation is crucial with single bool
   # that may have excepted.
   let jtext = try: raw_text.parseJson() except: nil
@@ -76,7 +107,7 @@ proc parseDatabaseShards*(raw_text: string): DatabaseShards =
 
 proc extractExplainIndexResult*(jtext: JsonNode): ExplainIndexResult =
   # /db/_explain
-  if jtext.kind == JNull: return ExplainIndexResult()
+  if jtext.isNil: return ExplainIndexResult()
   result = ExplainIndexResult(
     dbname            : jtext["dbname"].getStr,
     index             : jtext.getOrDefault("index"),
@@ -95,7 +126,7 @@ proc parseExplainIndexResult*(raw_text: string): ExplainIndexResult =
 
 proc extractUpdatedDocuments*(jtext: JsonNode): seq[UpdatedDocument] =
   # /{db}/_bulk_docs
-  if jtext.kind == JNull: return @[]
+  if jtext.isNil: return @[]
   for doc in jtext.elems:
     var upDocOk: bool
     try:
@@ -131,7 +162,7 @@ proc parseSearchedEntity*(raw_text: string): SearchedEntity =
   raw_text.parseJson.to(SearchedEntity)
 
 proc extractFoundDocuments*(jtext: JsonNode): FoundDocuments =
-  if jtext.kind == JNull: return FoundDocuments()
+  if jtext.isNil: return FoundDocuments()
   let
     docs = try: jtext["docs"].elems except: @[]
     jexec_stats = try: jtext["execution_stats"].fields except: {"": JsonNode()}.toOrderedTable()
@@ -173,7 +204,7 @@ proc parseDocumentEntity*(raw_text: string): DocumentEntity =
 
 func extractDocumentResult*(jtext: JsonNode): DocumentResult =
   # /{db}/_bulk_get
-  if jtext.kind == JNull: return DocumentResult()
+  if jtext.isNil: return DocumentResult()
   if jtext["docs"].elems[0].fields.hasKey("ok"):
     let
       doc = jtext["docs"].elems[0].fields["ok"]

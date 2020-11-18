@@ -36,6 +36,7 @@ type
     purge_seq         : string
     purged            : seq[DocumentMiniSpec]
   Users                {.used.} = object of RootObj
+    # /{db}/_security
     names             : seq[string]
     roles             : seq[string]
   Admins               {.used.} = ref object of Users
@@ -45,6 +46,9 @@ type
     id                : string
     name              : string
   SimpleConfirmation   {.used.} = object
+    # /db/_compact
+    # /db/_compact/design-doc
+    # /db/_view_cleanup
     ok                : bool
   DocChangesResponse   {.used.} = object
     last_seq          : string
@@ -97,7 +101,6 @@ type
       of false:
         error         : string
         reason        : string
-
   SearchedEntity       {.used.} = object
     selector          : JsonNode
     limit             : int
