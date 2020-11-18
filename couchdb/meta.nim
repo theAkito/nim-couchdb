@@ -3,8 +3,7 @@
 ]#
 import
   json,
-  tables,
-  strtabs
+  tables
 
 type
   DocumentEntityState  {.used.} = enum
@@ -26,8 +25,11 @@ type
   # PUT /{db}/_purged_infos_limit
   PurgedInfosLimit     {.used.} = distinct int
   RevsLimit            {.used.} = distinct int
-  DocumentMiniSpec     {.used.} = distinct StringTableRef
-  MissingRevs          {.used.} = distinct StringTableRef
+  # POST /{db}/_purge
+  # POST /{db}/_missing_revs
+  DocumentMiniSpec     {.used.} = OrderedTable[string, seq[string]]
+  MissingRevs          {.used.} = object
+    missing_revs      : DocumentMiniSpec
   RevsDiff             {.used.} = object
     missing           : seq[string]
     possible_ancestors: seq[string]
@@ -35,7 +37,7 @@ type
     revsDiffs         : Table[string, seq[RevsDiff]]
   PurgeResponse        {.used.} = object
     purge_seq         : string
-    purged            : OrderedTable[string, seq[string]]
+    purged            : DocumentMiniSpec
   Users                {.used.} = object of RootObj
     # /{db}/_security
     names             : seq[string]

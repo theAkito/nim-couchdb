@@ -7,7 +7,6 @@ import
   strutils,
   json,
   tables,
-  strtabs,
   segfaults
 include
   meta
@@ -15,6 +14,9 @@ include
 func `&`(collection: DocumentResults, item: DocumentResult): DocumentResults =
   # Putting into `metacompat.nim` and exporting does not work.
   result = DocumentResults(cast[seq[DocumentResult]](collection) & item)
+
+func extractDocumentMiniSpec*(jtext: JsonNode, key: string): DocumentMiniSpec =
+  result = DocumentMiniSpec(jtext.getOrDefault(key).getFields().valToStrSeq)
 
 proc parseCouchResponseHeaders*(raw_text: string): CouchResponseHeaders =
   raw_text.parseJson.to(CouchResponseHeaders)
@@ -25,12 +27,24 @@ proc parseRevsDiff*(raw_text: string): RevsDiff =
 proc parseRevsDiffResponse*(raw_text: string): RevsDiffResponse =
   raw_text.parseJson.to(RevsDiffResponse)
 
+proc extractMissingRevs*(jtext: JsonNode): MissingRevs =
+  # /db/_purge
+  if jtext.isNil: return MissingRevs()
+  result = try: MissingRevs(
+    missing_revs : jtext.extractDocumentMiniSpec("missing_revs")
+  ) except: MissingRevs()
+
+proc parseMissingRevs*(raw_text: string): MissingRevs =
+  # /db/_purge
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractMissingRevs(jtext)
+
 proc extractPurgeResponse*(jtext: JsonNode): PurgeResponse =
   # /db/_purge
   if jtext.isNil: return PurgeResponse()
   result = try: PurgeResponse(
     purge_seq : jtext.getOrDefault("purge_seq").getStr,
-    purged    : jtext.getOrDefault("purged").getFields().valToStrSeq
+    purged    : jtext.extractDocumentMiniSpec("purged")
   ) except: PurgeResponse()
 
 proc parsePurgeResponse*(raw_text: string): PurgeResponse =
