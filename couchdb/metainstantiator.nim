@@ -7,8 +7,7 @@ import
   strutils,
   json,
   tables,
-  segfaults
-include
+  segfaults,
   meta
 
 func `&`(collection: DocumentResults, item: DocumentResult): DocumentResults =
@@ -23,18 +22,16 @@ proc parseCouchResponseHeaders*(raw_text: string): CouchResponseHeaders =
 
 proc extractRevsDiff*(jtext: JsonNode): RevsDiff =
   # POST /{db}/_revs_diff
-  if jtext.isNil: return RevsDiff()
+  let emptyTable = { "": RevsDiffEntity() }.toOrderedTable
+  if jtext.isNil: return RevsDiff( emptyTable )
   result = try: RevsDiff(
-    missing : jtext.getStrSeq
-  ) except: RevsDiff()
+    jtext.getFields().valToRevsDiffEntity
+  ) except: RevsDiff( emptyTable )
 
 proc parseRevsDiff*(raw_text: string): RevsDiff =
   # POST /{db}/_revs_diff
   let jtext = try: raw_text.parseJson() except: nil
   result = extractRevsDiff(jtext)
-
-proc parseRevsDiffResponse*(raw_text: string): RevsDiffResponse =
-  raw_text.parseJson.to(RevsDiffResponse)
 
 proc extractMissingRevs*(jtext: JsonNode): MissingRevs =
   # /db/_purge
@@ -91,12 +88,12 @@ proc extractUsers*(jtext: JsonNode): (Admins, Members) =
     member_roles  = member_fields.getOrDefault("roles")
   result = (
     Admins(
-      names : admin_names.getStrSeq,
-      roles : admin_roles.getStrSeq
+      names : admin_names.toStrSeq,
+      roles : admin_roles.toStrSeq
     ),
     Members(
-      names : member_names.getStrSeq,
-      roles : member_roles.getStrSeq
+      names : member_names.toStrSeq,
+      roles : member_roles.toStrSeq
     )
   )
 
@@ -148,7 +145,7 @@ proc extractExplainIndexResult*(jtext: JsonNode): ExplainIndexResult =
     opts              : jtext.getOrDefault("opts"),
     limit             : jtext["limit"].getInt,
     skip              : jtext["skip"].getInt,
-    fields            : jtext["fields"].getStrSeq,
+    fields            : jtext["fields"].toStrSeq,
     rrange            : jtext.getOrDefault("rrange")
   )
 

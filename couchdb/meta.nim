@@ -6,159 +6,160 @@ import
   tables
 
 type
-  DocumentEntityState  {.used.} = enum
+  DocumentEntityState             * = enum
     ok, error
-  CouchResponseHeaders {.used.} = object
-    cache_control     : string
-    content_length    : int
-    eTag              : string
-    transfer_encoding : string
-  Selector             {.used.} = object
-  NewIndex             {.used.} = object
+  CouchResponseHeaders            * = object
+    cache_control                 * : string
+    content_length                * : int
+    eTag                          * : string
+    transfer_encoding             * : string
+  Selector                        * = object
+  NewIndex                        * = object
     # /db/_index
-    index             : JsonNode
-    ddoc              : string
-    name              : string
-    ttype             : string
-    partial_filter_selector : JsonNode
-    partitioned       : bool
+    index                         * : JsonNode
+    ddoc                          * : string
+    name                          * : string
+    ttype                         * : string
+    partial_filter_selector       * : JsonNode
+    partitioned                   * : bool
   # PUT /{db}/_purged_infos_limit
-  PurgedInfosLimit     {.used.} = distinct int
-  RevsLimit            {.used.} = distinct int
+  PurgedInfosLimit                * = distinct int
+  RevsLimit                       * = distinct int
   # POST /{db}/_purge
   # POST /{db}/_missing_revs
-  DocumentMiniSpec     {.used.} = OrderedTable[string, seq[string]]
-  MissingRevs          {.used.} = object
-    missing_revs      : DocumentMiniSpec
-  RevsDiff             {.used.} = object
-    missing           : seq[string]
-    possible_ancestors: seq[string]
-  RevsDiffResponse     {.used.} = object
-    revsDiffs         : Table[string, seq[RevsDiff]]
-  PurgeResponse        {.used.} = object
-    purge_seq         : string
-    purged            : DocumentMiniSpec
-  Users                {.used.} = object of RootObj
+  DocumentMiniSpec                * = OrderedTable[string, seq[string]]
+  MissingRevs                     * = object
+    missing_revs                  * : DocumentMiniSpec
+  RevsDiffEntity                  * = object
+    # POST /{db}/_revs_diff
+    missing                       * : seq[string]
+    possible_ancestors            * : seq[string]
+  # POST /{db}/_revs_diff
+  RevsDiff                        * = distinct OrderedTable[string, RevsDiffEntity]
+  PurgeResponse                   * = object
+    purge_seq                     * : string
+    purged                        * : DocumentMiniSpec
+  Users                           * = object of RootObj
     # /{db}/_security
-    names             : seq[string]
-    roles             : seq[string]
-  Admins               {.used.} = ref object of Users
-  Members              {.used.} = ref object of Users
-  NewIndexResult       {.used.} = object
-    result            : string
-    id                : string
-    name              : string
-  SimpleConfirmation   {.used.} = object
+    names                         * : seq[string]
+    roles                         * : seq[string]
+  Admins                          * = ref object of Users
+  Members                         * = ref object of Users
+  NewIndexResult                  * = object
+    result                        * : string
+    id                            * : string
+    name                          * : string
+  SimpleConfirmation              * = object
     # /db/_compact
     # /db/_compact/design-doc
     # /db/_view_cleanup
-    ok                : bool
-  DocChangesResponse   {.used.} = object
-    last_seq          : string
-    pending           : int
-    results           : seq[JsonNode]
-  DocChangesQuery      {.used.} = object
-    doc_ids           : seq[string]
-    conflicts         : bool
-    descending        : bool
-    feed              : string
-    filter            : string
-    heartbeat         : int
-    include_docs      : bool
-    attachments       : bool
-    att_encoding_info : bool
-    last_event_id     : int
-    limit             : int
-    since             : string
-    style             : string
-    timeout           : int
-    view              : string
-    seq_interval      : int
-    reason            : seq[string]
-    nodes             : seq[string]
-  SyncShardsResponse   {.used.} = object
-    ok                : bool
-    error             : seq[string]
-    reason            : seq[string]
-    nodes             : seq[string]
-  DocShardResponse     {.used.} = object
-    rrange            : string
-    nodes             : seq[string]
-  DatabaseShards       {.used.} = object
-    shards            : JsonNode
-  ExplainIndexResult   {.used.} = object
-    dbname            : string
-    index             : JsonNode
-    selector          : JsonNode
-    opts              : JsonNode
-    limit             : int
-    skip              : int
-    fields            : seq[string]
-    rrange            : JsonNode # Perhaps make definitive.
-  UpdatedDocument      {.used.} = object
+    ok                            * : bool
+  DocChangesResponse              * = object
+    last_seq                      * : string
+    pending                       * : int
+    results                       * : seq[JsonNode]
+  DocChangesQuery                 * = object
+    doc_ids                       * : seq[string]
+    conflicts                     * : bool
+    descending                    * : bool
+    feed                          * : string
+    filter                        * : string
+    heartbeat                     * : int
+    include_docs                  * : bool
+    attachments                   * : bool
+    att_encoding_info             * : bool
+    last_event_id                 * : int
+    limit                         * : int
+    since                         * : string
+    style                         * : string
+    timeout                       * : int
+    view                          * : string
+    seq_interval                  * : int
+    reason                        * : seq[string]
+    nodes                         * : seq[string]
+  SyncShardsResponse              * = object
+    ok                            * : bool
+    error                         * : seq[string]
+    reason                        * : seq[string]
+    nodes                         * : seq[string]
+  DocShardResponse                * = object
+    rrange                        * : string
+    nodes                         * : seq[string]
+  DatabaseShards                  * = object
+    shards                        * : JsonNode
+  ExplainIndexResult              * = object
+    dbname                        * : string
+    index                         * : JsonNode
+    selector                      * : JsonNode
+    opts                          * : JsonNode
+    limit                         * : int
+    skip                          * : int
+    fields                        * : seq[string]
+    rrange                        * : JsonNode # Perhaps make definitive.
+  UpdatedDocument                 * = object
     # /{db}/_bulk_docs
-    id                : string
-    case ok: bool:
+    id                            * : string
+    case ok* : bool:
       of true:
-        rev           : string
+        rev                       * : string
       of false:
-        error         : string
-        reason        : string
-  SearchedEntity       {.used.} = object
-    selector          : JsonNode
-    limit             : int
-    skip              : int
-    sort              : seq[string]
-    fields            : seq[string]
-    use_index         : seq[string]
-    r                 : int
-    bookmark          : string
-    update            : bool
-    stable            : bool
-    execution_stats   : bool
-  ExecutionStats       {.used.} = object
-    total_keys_examined : int
-    total_docs_examined : int
-    total_quorum_docs_examined : int
-    results_returned    : int
-    execution_time_ms   : float
-  FoundDocuments       {.used.} = object
-    docs              : seq[JsonNode]
-    warning           : string
-    execution_stats   : ExecutionStats
-    bookmark          : string
-  WantedDocument       {.used.} = object of RootObj
+        error                     * : string
+        reason                    * : string
+  SearchedEntity                  * = object
+    selector                      * : JsonNode
+    limit                         * : int
+    skip                          * : int
+    sort                          * : seq[string]
+    fields                        * : seq[string]
+    use_index                     * : seq[string]
+    r                             * : int
+    bookmark                      * : string
+    update                        * : bool
+    stable                        * : bool
+    execution_stats               * : bool
+  ExecutionStats                  * = object
+    total_keys_examined           * : int
+    total_docs_examined           * : int
+    total_quorum_docs_examined    * : int
+    results_returned              * : int
+    execution_time_ms             * : float
+  FoundDocuments                  * = object
+    docs                          * : seq[JsonNode]
+    warning                       * : string
+    execution_stats               * : ExecutionStats
+    bookmark                      * : string
+  WantedDocument                  * = object of RootObj
     # /{db}/_bulk_get
-    id                : string
-    rev               : string
-    atts_since        : string
-  WantedDocuments      {.used.} = object
+    id                            * : string
+    rev                           * : string
+    atts_since                    * : string
+  WantedDocuments                 * = object
     # /{db}/_bulk_get
-    docs              : seq[WantedDocument]
-  DocRevisions         {.used.} = object
-    start             : int
-    ids               : seq[string]
-  DocOk                {.used.} = object
-    id                : string
-    rev               : string
-    value             : JsonNode
-    revisions         : DocRevisions
-  DocErr               {.used.} = object
-    id                : string
-    rev               : string
-    error             : string
-    reason            : string
-  DocumentEntity       {.used.} = object
-    case state: DocumentEntityState:
+    docs                          * : seq[WantedDocument]
+  DocRevisions                    * = object
+    start                         * : int
+    ids                           * : seq[string]
+  DocOk                           * = object
+    id                            * : string
+    rev                           * : string
+    value                         * : JsonNode
+    revisions                     * : DocRevisions
+  DocErr                          * = object
+    id                            * : string
+    rev                           * : string
+    error                         * : string
+    reason                        * : string
+  DocumentEntity                  * = object
+    case state* : DocumentEntityState:
       of ok:
-        ok            : DocOk
+        ok                        * : DocOk
       of error:
-        error         : DocErr
-  DocumentResult       {.used.} = object
+        error                     * : DocErr
+  DocumentResult                  * = object
     # /{db}/_bulk_get
-    id                : string
-    docs              : seq[DocumentEntity]
-  DocumentResults      {.used.} = distinct seq[DocumentResult]
+    id                            * : string
+    docs                          * : seq[DocumentEntity]
+  DocumentResults                 * = distinct seq[DocumentResult]
 
 when isMainModule:
   echo UpdatedDocument(
@@ -174,63 +175,63 @@ when isMainModule:
   )
 
 const
-  name_db                 {.strdefine, used.} = "/db"
-  resp_ok                            {.used.} = "200 - OK"
-  resp_created                       {.used.} = "201 - Created"
-  resp_accepted                      {.used.} = "202 - Accepted"
-  resp_badRequest                    {.used.} = "400 - Bad Request"
-  resp_unauthorized                  {.used.} = "401 - Unauthorized"
-  resp_forbidden                     {.used.} = "403 - Forbidden"
-  resp_notFound                      {.used.} = "404 - Not Found"
-  resp_methodNotAllowed              {.used.} = "405 - Method Not Allowed"
-  resp_notAcceptable                 {.used.} = "406 - Not Acceptable"
-  resp_conflict                      {.used.} = "409 - Conflict"
-  resp_preconditionFailed            {.used.} = "412 - Precondition Failed"
-  resp_requestEntityTooLarge         {.used.} = "413 - Request Entity Too Large"
-  resp_unsupportedMediaType          {.used.} = "415 - Unsupported Media Type"
-  resp_requestedRangeNotSatisfiable  {.used.} = "416 - Requested Range Not Satisfiable"
-  resp_expectationFailed             {.used.} = "417 - Expectation Failed"
-  resp_internalServerError           {.used.} = "500 - Internal Server Error"
-  req_root                           {.used.} = "/"
-  req_sep                            {.used.} = req_root
-  req_active_tasks                   {.used.} = "/_active_tasks"
-  req_all_dbs                        {.used.} = "/_all_dbs"
-  req_dbs_info                       {.used.} = "/_dbs_info"
-  req_cluster_setup                  {.used.} = "/_cluster_setup"
-  req_db_updates                     {.used.} = "/_db_updates"
-  req_membership                     {.used.} = "/_membership"
-  req_replicate                      {.used.} = "/_replicate"
-  req_scheduler_jobs                 {.used.} = "/_scheduler/jobs"
-  req_scheduler_docs                 {.used.} = "/_scheduler/docs"
-  req_node_local                     {.used.} = "/_node/_local"
-  req_node_local_stats               {.used.} = "/_node/_local/_stats"
-  req_node_local_system              {.used.} = "/_node/_local/_system"
-  req_node_local_restart             {.used.} = "/_node/_local/_restart"
-  req_node_local_config              {.used.} = "/_node/_local/_config"
-  req_node_local_config_reload       {.used.} = "/_node/_local/_config/_reload"
-  req_search_analyze                 {.used.} = "/_search_analyze"
-  req_utils                          {.used.} = "/_utils"
-  req_up                             {.used.} = "/_up"
-  req_uuids                          {.used.} = "/_uuids"
-  req_favicon_ico                    {.used.} = "/favicon.ico"
-  req_reshard                        {.used.} = "/_reshard"
-  req_session                        {.used.} = "/_session"
-  req_db_all_docs                    {.used.} = "/_all_docs"
-  req_db_design_docs                 {.used.} = "/_design_docs"
-  req_db_bulk_get                    {.used.} = "/_bulk_get"
-  req_db_bulk_docs                   {.used.} = "/_bulk_docs"
-  req_db_find                        {.used.} = "/_find"
-  req_db_index                       {.used.} = "/_index"
-  req_db_explain                     {.used.} = "/_explain"
-  req_db_shards                      {.used.} = "/_shards"
-  req_db_sync_shards                 {.used.} = "/_sync_shards"
-  req_db_changes                     {.used.} = "/_changes"
-  req_db_compact                     {.used.} = "/_compact"
-  req_db_ensure_full_commit          {.used.} = "/_ensure_full_commit"
-  req_db_view_cleanup                {.used.} = "/_view_cleanup"
-  req_db_security                    {.used.} = "/_security"
-  req_db_purge                       {.used.} = "/_purge"
-  req_db_purged_infos_limit          {.used.} = "/_purged_infos_limit"
-  req_db_missing_revs                {.used.} = "/_missing_revs"
-  req_db_revs_diff                   {.used.} = "/_revs_diff"
-  req_db_revs_limit                  {.used.} = "/_revs_limit"
+  name_db                              {.strdefine, used.} = "/db"
+  resp_ok                                       * = "200 - OK"
+  resp_created                                  * = "201 - Created"
+  resp_accepted                                 * = "202 - Accepted"
+  resp_badRequest                               * = "400 - Bad Request"
+  resp_unauthorized                             * = "401 - Unauthorized"
+  resp_forbidden                                * = "403 - Forbidden"
+  resp_notFound                                 * = "404 - Not Found"
+  resp_methodNotAllowed                         * = "405 - Method Not Allowed"
+  resp_notAcceptable                            * = "406 - Not Acceptable"
+  resp_conflict                                 * = "409 - Conflict"
+  resp_preconditionFailed                       * = "412 - Precondition Failed"
+  resp_requestEntityTooLarge                    * = "413 - Request Entity Too Large"
+  resp_unsupportedMediaType                     * = "415 - Unsupported Media Type"
+  resp_requestedRangeNotSatisfiable             * = "416 - Requested Range Not Satisfiable"
+  resp_expectationFailed                        * = "417 - Expectation Failed"
+  resp_internalServerError                      * = "500 - Internal Server Error"
+  req_root                                      * = "/"
+  req_sep                                       * = req_root
+  req_active_tasks                              * = "/_active_tasks"
+  req_all_dbs                                   * = "/_all_dbs"
+  req_dbs_info                                  * = "/_dbs_info"
+  req_cluster_setup                             * = "/_cluster_setup"
+  req_db_updates                                * = "/_db_updates"
+  req_membership                                * = "/_membership"
+  req_replicate                                 * = "/_replicate"
+  req_scheduler_jobs                            * = "/_scheduler/jobs"
+  req_scheduler_docs                            * = "/_scheduler/docs"
+  req_node_local                                * = "/_node/_local"
+  req_node_local_stats                          * = "/_node/_local/_stats"
+  req_node_local_system                         * = "/_node/_local/_system"
+  req_node_local_restart                        * = "/_node/_local/_restart"
+  req_node_local_config                         * = "/_node/_local/_config"
+  req_node_local_config_reload                  * = "/_node/_local/_config/_reload"
+  req_search_analyze                            * = "/_search_analyze"
+  req_utils                                     * = "/_utils"
+  req_up                                        * = "/_up"
+  req_uuids                                     * = "/_uuids"
+  req_favicon_ico                               * = "/favicon.ico"
+  req_reshard                                   * = "/_reshard"
+  req_session                                   * = "/_session"
+  req_db_all_docs                               * = "/_all_docs"
+  req_db_design_docs                            * = "/_design_docs"
+  req_db_bulk_get                               * = "/_bulk_get"
+  req_db_bulk_docs                              * = "/_bulk_docs"
+  req_db_find                                   * = "/_find"
+  req_db_index                                  * = "/_index"
+  req_db_explain                                * = "/_explain"
+  req_db_shards                                 * = "/_shards"
+  req_db_sync_shards                            * = "/_sync_shards"
+  req_db_changes                                * = "/_changes"
+  req_db_compact                                * = "/_compact"
+  req_db_ensure_full_commit                     * = "/_ensure_full_commit"
+  req_db_view_cleanup                           * = "/_view_cleanup"
+  req_db_security                               * = "/_security"
+  req_db_purge                                  * = "/_purge"
+  req_db_purged_infos_limit                     * = "/_purged_infos_limit"
+  req_db_missing_revs                           * = "/_missing_revs"
+  req_db_revs_diff                              * = "/_revs_diff"
+  req_db_revs_limit                             * = "/_revs_limit"

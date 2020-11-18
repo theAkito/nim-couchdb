@@ -6,9 +6,8 @@ import
   httpclient,
   json,
   options,
-  tables
-include
-  couchdb/meta
+  tables,
+  couchdb/[meta, metainstantiator]
 
 template adjustClient(): untyped =
   http.headers["accept"] = "application/json"
