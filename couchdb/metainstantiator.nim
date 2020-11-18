@@ -21,8 +21,17 @@ func extractDocumentMiniSpec*(jtext: JsonNode, key: string): DocumentMiniSpec =
 proc parseCouchResponseHeaders*(raw_text: string): CouchResponseHeaders =
   raw_text.parseJson.to(CouchResponseHeaders)
 
+proc extractRevsDiff*(jtext: JsonNode): RevsDiff =
+  # POST /{db}/_revs_diff
+  if jtext.isNil: return RevsDiff()
+  result = try: RevsDiff(
+    missing : jtext.getStrSeq
+  ) except: RevsDiff()
+
 proc parseRevsDiff*(raw_text: string): RevsDiff =
-  raw_text.parseJson.to(RevsDiff)
+  # POST /{db}/_revs_diff
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractRevsDiff(jtext)
 
 proc parseRevsDiffResponse*(raw_text: string): RevsDiffResponse =
   raw_text.parseJson.to(RevsDiffResponse)
@@ -76,18 +85,18 @@ proc extractUsers*(jtext: JsonNode): (Admins, Members) =
   let
     admin_fields  = jtext.getOrDefault("admins").getFields()
     member_fields = jtext.getOrDefault("member").getFields()
-    admin_names   = admin_fields.getOrDefault("names").getElems()
-    member_names  = member_fields.getOrDefault("names").getElems()
-    admin_roles   = admin_fields.getOrDefault("roles").getElems()
-    member_roles  = member_fields.getOrDefault("roles").getElems()
+    admin_names   = admin_fields.getOrDefault("names")
+    member_names  = member_fields.getOrDefault("names")
+    admin_roles   = admin_fields.getOrDefault("roles")
+    member_roles  = member_fields.getOrDefault("roles")
   result = (
     Admins(
-      names : admin_names.mapIt(it.getStr),
-      roles : admin_roles.mapIt(it.getStr)
+      names : admin_names.getStrSeq,
+      roles : admin_roles.getStrSeq
     ),
     Members(
-      names : member_names.mapIt(it.getStr),
-      roles : member_roles.mapIt(it.getStr)
+      names : member_names.getStrSeq,
+      roles : member_roles.getStrSeq
     )
   )
 
@@ -139,7 +148,7 @@ proc extractExplainIndexResult*(jtext: JsonNode): ExplainIndexResult =
     opts              : jtext.getOrDefault("opts"),
     limit             : jtext["limit"].getInt,
     skip              : jtext["skip"].getInt,
-    fields            : jtext["fields"].getElems.mapIt(it.getStr),
+    fields            : jtext["fields"].getStrSeq,
     rrange            : jtext.getOrDefault("rrange")
   )
 
