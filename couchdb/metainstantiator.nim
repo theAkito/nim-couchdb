@@ -2,7 +2,9 @@
   MetaInstantiator: Create, Construct, Delete, Destroy, Convert, Transform & Manage Meta constructions.
 ]#
 import
+  metacompat,
   sequtils,
+  strutils,
   json,
   tables,
   strtabs,
@@ -23,14 +25,22 @@ proc parseRevsDiff*(raw_text: string): RevsDiff =
 proc parseRevsDiffResponse*(raw_text: string): RevsDiffResponse =
   raw_text.parseJson.to(RevsDiffResponse)
 
+proc extractPurgeResponse*(jtext: JsonNode): PurgeResponse =
+  # /db/_purge
+  if jtext.isNil: return PurgeResponse()
+  result = try: PurgeResponse(
+    purge_seq : jtext.getOrDefault("purge_seq").getStr,
+    purged    : jtext.getOrDefault("purged").getFields().valToStrSeq
+  ) except: PurgeResponse()
+
 proc parsePurgeResponse*(raw_text: string): PurgeResponse =
-  raw_text.parseJson.to(PurgeResponse)
+  # /db/_purge
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractPurgeResponse(jtext)
 
-proc parseAdmins*(raw_text: string): Admins =
-  raw_text.parseJson.to(Admins)
-
-proc parseMembers*(raw_text: string): Members =
-  raw_text.parseJson.to(Members)
+proc parsePurgedInfosLimit*(raw_text: string): PurgedInfosLimit =
+  # PUT /{db}/_purged_infos_limit
+  result = PurgedInfosLimit(try: raw_text.parseInt except: -127)
 
 proc extractNewIndexResult*(jtext: JsonNode): NewIndexResult =
   # /db/_index

@@ -23,6 +23,7 @@ type
     ttype             : string
     partial_filter_selector : JsonNode
     partitioned       : bool
+  # PUT /{db}/_purged_infos_limit
   PurgedInfosLimit     {.used.} = distinct int
   RevsLimit            {.used.} = distinct int
   DocumentMiniSpec     {.used.} = distinct StringTableRef
@@ -34,7 +35,7 @@ type
     revsDiffs         : Table[string, seq[RevsDiff]]
   PurgeResponse        {.used.} = object
     purge_seq         : string
-    purged            : seq[DocumentMiniSpec]
+    purged            : OrderedTable[string, seq[string]]
   Users                {.used.} = object of RootObj
     # /{db}/_security
     names             : seq[string]
