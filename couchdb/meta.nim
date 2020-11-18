@@ -16,11 +16,12 @@ type
     transfer_encoding : string
   Selector             {.used.} = object
   NewIndex             {.used.} = object
+    # /db/_index
     index             : JsonNode
     ddoc              : string
     name              : string
     ttype             : string
-    partial_filter_se : JsonNode
+    partial_filter_selector : JsonNode
     partitioned       : bool
   PurgedInfosLimit     {.used.} = distinct int
   RevsLimit            {.used.} = distinct int
@@ -86,7 +87,7 @@ type
     limit             : int
     skip              : int
     fields            : seq[string]
-    rrange            : JsonNode
+    rrange            : JsonNode # Perhaps make definitive.
   UpdatedDocument      {.used.} = object
     # /{db}/_bulk_docs
     id                : string

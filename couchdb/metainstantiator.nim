@@ -33,6 +33,7 @@ proc parseMembers*(raw_text: string): Members =
   raw_text.parseJson.to(Members)
 
 proc extractNewIndexResult*(jtext: JsonNode): NewIndexResult =
+  # /db/_index
   if jtext.kind == JNull: return NewIndexResult()
   result = try: NewIndexResult(
     result : jtext["result"].getStr(),
@@ -41,6 +42,7 @@ proc extractNewIndexResult*(jtext: JsonNode): NewIndexResult =
   ) except: NewIndexResult()
 
 proc parseNewIndexResult*(raw_text: string): NewIndexResult =
+  # /db/_index
   let jtext = try: raw_text.parseJson() except: nil
   result = extractNewIndexResult(jtext)
 
@@ -62,8 +64,24 @@ proc parseDocShardResponse*(raw_text: string): DocShardResponse =
 proc parseDatabaseShards*(raw_text: string): DatabaseShards =
   raw_text.parseJson.to(DatabaseShards)
 
+proc extractExplainIndexResult*(jtext: JsonNode): ExplainIndexResult =
+  # /db/_explain
+  if jtext.kind == JNull: return ExplainIndexResult()
+  result = ExplainIndexResult(
+    dbname            : jtext["dbname"].getStr,
+    index             : jtext.getOrDefault("index"),
+    selector          : jtext.getOrDefault("selector"),
+    opts              : jtext.getOrDefault("opts"),
+    limit             : jtext["limit"].getInt,
+    skip              : jtext["skip"].getInt,
+    fields            : jtext["fields"].getElems.mapIt(it.getStr),
+    rrange            : jtext.getOrDefault("rrange")
+  )
+
 proc parseExplainIndexResult*(raw_text: string): ExplainIndexResult =
-  raw_text.parseJson.to(ExplainIndexResult)
+  # /db/_explain
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractExplainIndexResult(jtext)
 
 proc extractUpdatedDocuments*(jtext: JsonNode): seq[UpdatedDocument] =
   # /{db}/_bulk_docs
