@@ -46,8 +46,18 @@ proc parseNewIndexResult*(raw_text: string): NewIndexResult =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractNewIndexResult(jtext)
 
+proc extractSimpleConfirmation*(jtext: JsonNode): SimpleConfirmation =
+  if jtext.kind == JNull: return SimpleConfirmation()
+  result = try: SimpleConfirmation(
+    ok : jtext["ok"].getBool
+  ) except: SimpleConfirmation()
+
 proc parseSimpleConfirmation*(raw_text: string): SimpleConfirmation =
-  raw_text.parseJson.to(SimpleConfirmation)
+  # /db/_compact
+  # Response Header validation is crucial with single bool
+  # that may have excepted.
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractSimpleConfirmation(jtext)
 
 proc parseDocChangesResponse*(raw_text: string): DocChangesResponse =
   raw_text.parseJson.to(DocChangesResponse)
