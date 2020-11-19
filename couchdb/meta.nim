@@ -120,6 +120,23 @@ type
     # GET /{db}/_design/{ddoc}/_info
     name                          * : string
     view_index                    * : string
+  ViewRow                         * = object
+    # GET /{db}/_design/{ddoc}/_view/{view}
+    id                            * : int
+    key                           * : string
+    value                         * : JsonNode
+  DesignDocViewResponse           * = object
+    # GET /{db}/_design/{ddoc}/_view/{view}
+    offset                        * : int
+    rows                          * : seq[ViewRow]
+    total_rows                    * : int
+    #TODO: Figure out the object representation of this node.
+    update_seq                    * : JsonNode
+  DesignDocIndexSearchResponse    * = object
+    # GET /{db}/_design/{ddoc}/_search/{index}
+    rows                          * : seq[ViewRow]
+    total_rows                    * : int
+    bookmark                      * : string
   SyncShardsResponse              * = object
     ok                            * : bool
     error                         * : seq[string]
@@ -218,7 +235,7 @@ when isMainModule:
   )
 
 const
-  name_db                              {.strdefine, used.} = "/db"
+  name_db                         * {.strdefine.} = "/db"
   resp_ok                                       * = "200 - OK"
   resp_created                                  * = "201 - Created"
   resp_accepted                                 * = "202 - Accepted"
