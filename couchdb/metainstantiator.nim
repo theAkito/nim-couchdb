@@ -20,6 +20,21 @@ func extractDocumentMiniSpec*(jtext: JsonNode, key: string): DocumentMiniSpec =
 proc parseCouchResponseHeaders*(raw_text: string): CouchResponseHeaders =
   raw_text.parseJson.to(CouchResponseHeaders)
 
+proc extractNewDocumentResponse*(jtext: JsonNode): NewDocumentResponse =
+  # PUT /{db}/{docid}
+  if jtext.isNil: return NewDocumentResponse()
+  let fields = jtext.getFields()
+  result = try: NewDocumentResponse(
+    id  : fields.getOrDefault("id").getStr,
+    ok  : fields.getOrDefault("ok").getBool,
+    rev : fields.getOrDefault("rev").getStr
+  ) except: NewDocumentResponse()
+
+proc parseNewDocumentResponse*(raw_text: string): NewDocumentResponse =
+  # PUT /{db}/{docid}
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractNewDocumentResponse(jtext)
+
 proc extractRevsDiff*(jtext: JsonNode): RevsDiff =
   # POST /{db}/_revs_diff
   let emptyTable = { "": RevsDiffEntity() }.toOrderedTable

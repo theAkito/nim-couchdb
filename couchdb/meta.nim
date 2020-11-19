@@ -53,6 +53,7 @@ type
     # /db/_compact
     # /db/_compact/design-doc
     # /db/_view_cleanup
+    # PUT /{db}/_revs_limit
     ok                            * : bool
   DocChangesResponse              * = object
     last_seq                      * : string
@@ -77,6 +78,22 @@ type
     seq_interval                  * : int
     reason                        * : seq[string]
     nodes                         * : seq[string]
+  Document                        * = object
+    # GET /{db}/{docid}
+    id                            * : string
+    rev                           * : string
+    deleted                       * : bool
+    attachments                   * : JsonNode
+    conflicts                     * : seq[string]
+    deleted_conflicts             * : seq[string]
+    local_seq                     * : string
+    revs_info                     * : seq[JsonNode]
+    revisions                     * : JsonNode
+  NewDocumentResponse             * = object
+    # PUT /{db}/{docid}
+    id                            * : string
+    ok                            * : bool
+    rev                           * : string
   SyncShardsResponse              * = object
     ok                            * : bool
     error                         * : seq[string]
