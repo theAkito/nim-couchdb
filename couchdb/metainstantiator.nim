@@ -20,8 +20,50 @@ func extractDocumentMiniSpec*(jtext: JsonNode, key: string): DocumentMiniSpec =
 proc parseCouchResponseHeaders*(raw_text: string): CouchResponseHeaders =
   raw_text.parseJson.to(CouchResponseHeaders)
 
+proc extractViewIndexSizes*(jtext: JsonNode): ViewIndexSizes =
+  # GET /{db}/_design/{ddoc}/_info
+  if jtext.isNil: return ViewIndexSizes()
+  let fields = jtext.getFields()
+  result = try: ViewIndexSizes(
+    active   : fields.getOrDefault("active").getInt,
+    disk     : fields.getOrDefault("disk").getInt,
+    external : fields.getOrDefault("external").getInt
+  ) except: ViewIndexSizes()
+
+proc extractViewIndex*(jtext: JsonNode): ViewIndex =
+  # GET /{db}/_design/{ddoc}/_info
+  if jtext.isNil: return ViewIndex()
+  let fields = jtext.getFields()
+  result = try: ViewIndex(
+    compact_running : fields.getOrDefault("compact_running").getBool,
+    language        : fields.getOrDefault("language").getStr,
+    purge_seq       : fields.getOrDefault("purge_seq").getInt,
+    signature       : fields.getOrDefault("purge_seq").getStr,
+    sizes           : fields.getOrDefault("sizes").extractViewIndexSizes,
+    update_seq      : fields.getOrDefault("update_seq").getStr,
+    updater_running : fields.getOrDefault("updater_running").getBool,
+    waiting_clients : fields.getOrDefault("waiting_clients").getInt,
+    waiting_commit  : fields.getOrDefault("waiting_commit").getBool
+  ) except: ViewIndex()
+
+proc extractViewIndexResponse*(jtext: JsonNode): ViewIndexResponse =
+  # GET /{db}/_design/{ddoc}/_info
+  if jtext.isNil: return ViewIndexResponse()
+  let fields = jtext.getFields()
+  result = try: ViewIndexResponse(
+    name       : fields.getOrDefault("name").getStr,
+    view_index : fields.getOrDefault("view_index").extractViewIndex
+  ) except: ViewIndexResponse()
+
+proc parseViewIndexResponse*(raw_text: string): ViewIndexResponse =
+  # GET /{db}/_design/{ddoc}/_info
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractViewIndexResponse(jtext)
+
 proc extractNewDocumentResponse*(jtext: JsonNode): NewDocumentResponse =
   # PUT /{db}/{docid}
+  # PUT /{db}/{docid}/{attname}
+  # DELETE /{db}/{docid}/{attname}
   if jtext.isNil: return NewDocumentResponse()
   let fields = jtext.getFields()
   result = try: NewDocumentResponse(
@@ -32,6 +74,8 @@ proc extractNewDocumentResponse*(jtext: JsonNode): NewDocumentResponse =
 
 proc parseNewDocumentResponse*(raw_text: string): NewDocumentResponse =
   # PUT /{db}/{docid}
+  # PUT /{db}/{docid}/{attname}
+  # DELETE /{db}/{docid}/{attname}
   let jtext = try: raw_text.parseJson() except: nil
   result = extractNewDocumentResponse(jtext)
 

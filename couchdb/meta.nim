@@ -91,9 +91,35 @@ type
     revisions                     * : JsonNode
   NewDocumentResponse             * = object
     # PUT /{db}/{docid}
+    # PUT /{db}/{docid}/{attname}
+    # DELETE /{db}/{docid}/{attname}
     id                            * : string
     ok                            * : bool
     rev                           * : string
+  ViewIndexSizes                  * = object
+    # GET /{db}/_design/{ddoc}/_info
+    active                        * : int
+    disk                          * : int
+    external                      * : int
+  ViewIndex                       * = object
+    # GET /{db}/_design/{ddoc}/_info
+    compact_running               * : bool
+    language                      * : string
+    purge_seq                     * : int
+    signature                     * : string
+    sizes                         * : ViewIndexSizes
+    update_seq                    * : string
+    updater_running               * : bool
+    waiting_clients               * : int
+    waiting_commit                * : bool
+  ViewIndexResponse               * = object
+    # GET /{db}/_design/{ddoc}/_info
+    name                          * : string
+    view_index                    * : ViewIndex
+  DesignDocInfo                   * = object
+    # GET /{db}/_design/{ddoc}/_info
+    name                          * : string
+    view_index                    * : string
   SyncShardsResponse              * = object
     ok                            * : bool
     error                         * : seq[string]
