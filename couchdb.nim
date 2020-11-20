@@ -7,7 +7,7 @@ import
   json,
   options,
   tables,
-  couchdb/[meta, metainstantiator]
+  couchdb/[meta, couchmeta, metainstantiator, modelapplicator]
 
 template adjustClient(): untyped =
   http.headers["accept"] = "application/json"
@@ -42,7 +42,15 @@ proc getDbAllDesignDocs(http: HttpClient, db, url, req_kind: string): bool =
 proc getDbBulkDocs(http: HttpClient, db, url, req_kind: string, docs: WantedDocuments): bool =
   http.reqPost(url & req_sep & db, req_db_bulk_get, $(%* docs))
 
-when isMainModule:
-  echo "Greetings!"
+when mode_debug:
+  echo WantedDocuments(
+    docs: @[
+      WantedDocument(
+        id : "id1a",
+        rev : "rev2a",
+        atts_since : "atts_since3a"
+      )
+    ]
+  ).toJtext.parseJson.pretty
 
 {.pop.}

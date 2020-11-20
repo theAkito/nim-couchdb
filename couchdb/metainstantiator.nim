@@ -1,6 +1,7 @@
 #[
-  MetaInstantiator: Create, Construct, Delete, Destroy, Convert, Transform & Manage Meta constructions.
+  MetaInstantiator: Create, Construct, Delete, Destroy, Convert, Transform & Manage couchmeta constructions.
 ]#
+{.push gcsafe.}
 import
   metacompat,
   sequtils,
@@ -8,7 +9,7 @@ import
   json,
   tables,
   segfaults,
-  meta
+  couchmeta
 
 func `&`(collection: DocumentResults, item: DocumentResult): DocumentResults =
   # Putting into `metacompat.nim` and exporting does not work.
@@ -343,3 +344,5 @@ proc parseDocumentResults*(raw_text: string): DocumentResults =
   # /{db}/_bulk_get
   for res in raw_text.parseJson().elems:
     result = result & extractDocumentResult(res)
+
+{.pop.}

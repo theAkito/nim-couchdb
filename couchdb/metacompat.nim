@@ -1,11 +1,11 @@
 #[
-  MetaCompat: Compatability funcs for working with project-specific meta constructions.
+  MetaCompat: Compatability funcs for working with project-specific couchmeta constructions.
 ]#
 import
   json,
   sequtils,
   tables,
-  meta
+  couchmeta
 
 func toStrSeq*(jtext: JsonNode): seq[string] =
   jtext.getElems.mapIt(it.getStr)

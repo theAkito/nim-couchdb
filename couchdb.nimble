@@ -35,7 +35,7 @@ task fbuild, "Build project.":
        """
 task dbuild, "Debug Build project.":
   exec """nim c \
-            --define:debug:true \
+            --define:mode_debug \
             --debuginfo:on \
             --out:couchdb \
             couchdb
