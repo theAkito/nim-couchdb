@@ -38,7 +38,7 @@ proc extractViewIndex*(jtext: JsonNode): ViewIndex =
     compact_running : fields.getOrDefault("compact_running").getBool,
     language        : fields.getOrDefault("language").getStr,
     purge_seq       : fields.getOrDefault("purge_seq").getInt,
-    signature       : fields.getOrDefault("purge_seq").getStr,
+    signature       : fields.getOrDefault("signature").getStr,
     sizes           : fields.getOrDefault("sizes").extractViewIndexSizes,
     update_seq      : fields.getOrDefault("update_seq").getStr,
     updater_running : fields.getOrDefault("updater_running").getBool,
@@ -59,6 +59,35 @@ proc parseViewIndexResponse*(raw_text: string): ViewIndexResponse =
   # GET /{db}/_design/{ddoc}/_info
   let jtext = try: raw_text.parseJson() except: nil
   result = extractViewIndexResponse(jtext)
+
+proc extractViewRow*(jtext: seq[JsonNode]): seq[ViewRow] =
+  # GET /{db}/_design/{ddoc}/_view/{view}
+  if jtext.len == 0: return @[ViewRow()]
+  for jnode in jtext:
+    let fields = jnode.getFields
+    result.add(
+      try: ViewRow(
+        id    : fields.getOrDefault("id").getStr,
+        key   : fields.getOrDefault("key").getStr,
+        value : fields.getOrDefault("value")
+      ) except: ViewRow()
+    )
+
+proc extractDesignDocViewResponse*(jtext: JsonNode): DesignDocViewResponse =
+  # GET /{db}/_design/{ddoc}/_view/{view}
+  if jtext.isNil: return DesignDocViewResponse()
+  let fields = jtext.getFields()
+  result = try: DesignDocViewResponse(
+    offset     : fields.getOrDefault("offset").getInt,
+    rows       : fields.getOrDefault("rows").getElems.extractViewRow,
+    total_rows : fields.getOrDefault("total_rows").getInt,
+    update_seq : fields.getOrDefault("update_seq")
+  ) except: DesignDocViewResponse()
+
+proc parseDesignDocViewResponse*(raw_text: string): DesignDocViewResponse =
+  # GET /{db}/_design/{ddoc}/_view/{view}
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractDesignDocViewResponse(jtext)
 
 proc extractNewDocumentResponse*(jtext: JsonNode): NewDocumentResponse =
   # PUT /{db}/{docid}

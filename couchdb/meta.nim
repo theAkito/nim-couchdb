@@ -122,7 +122,7 @@ type
     view_index                    * : string
   ViewRow                         * = object
     # GET /{db}/_design/{ddoc}/_view/{view}
-    id                            * : int
+    id                            * : string
     key                           * : string
     value                         * : JsonNode
   DesignDocViewResponse           * = object
