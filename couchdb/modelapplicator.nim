@@ -4,5 +4,4 @@ import
   metainstantiator,
   json
 
-func toJtext*(docs: WantedDocuments): string =
-  $(%* docs)
+func toJtext*(docs: WantedDocuments): string = $(%* docs)

@@ -8,6 +8,8 @@ import
   options,
   tables,
   couchdb/[meta, couchmeta, metainstantiator, modelapplicator]
+export
+  couchmeta
 
 template adjustClient(): untyped =
   http.headers["accept"] = "application/json"
@@ -40,7 +42,7 @@ proc getDbAllDesignDocs(http: HttpClient, db, url, req_kind: string): bool =
   http.reqGet(url & req_sep & db, req_db_design_docs)
 
 proc getDbBulkDocs(http: HttpClient, db, url, req_kind: string, docs: WantedDocuments): bool =
-  http.reqPost(url & req_sep & db, req_db_bulk_get, $(%* docs))
+  http.reqPost(url & req_sep & db, req_db_bulk_get, docs.toJtext)
 
 when mode_debug:
   echo WantedDocuments(
@@ -49,6 +51,16 @@ when mode_debug:
         id : "id1a",
         rev : "rev2a",
         atts_since : "atts_since3a"
+      ),
+      WantedDocument(
+        id : "id1b",
+        rev : "rev2b",
+        atts_since : "atts_since3b"
+      ),
+      WantedDocument(
+        id : "id1c",
+        rev : "rev2c",
+        atts_since : "atts_since3c"
       )
     ]
   ).toJtext.parseJson.pretty

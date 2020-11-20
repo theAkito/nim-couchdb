@@ -196,6 +196,15 @@ type
   WantedDocuments                 * = object
     # /{db}/_bulk_get
     docs                          * : seq[WantedDocument]
+  NewDocument                     * = object of RootObj
+    #TODO
+    # POST /{db}/_bulk_docs
+    id                            * : string
+    rev                           * : string
+    atts_since                    * : string
+  BulkDocuments                   * = object
+    # POST /{db}/_bulk_docs
+    docs                          * : seq[NewDocument]
   DocRevisions                    * = object
     start                         * : int
     ids                           * : seq[string]
