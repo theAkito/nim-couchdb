@@ -62,7 +62,7 @@ proc parseViewIndexResponse*(raw_text: string): ViewIndexResponse =
 
 proc extractViewRow*(jtext: seq[JsonNode]): seq[ViewRow] =
   # GET /{db}/_design/{ddoc}/_view/{view}
-  if jtext.len == 0: return @[ViewRow()]
+  if jtext.len == 0: return @[]
   for jnode in jtext:
     let fields = jnode.getFields
     result.add(
@@ -72,6 +72,7 @@ proc extractViewRow*(jtext: seq[JsonNode]): seq[ViewRow] =
         value : fields.getOrDefault("value")
       ) except: ViewRow()
     )
+  result.filterIt(it != ViewRow())
 
 proc extractDesignDocViewResponse*(jtext: JsonNode): DesignDocViewResponse =
   # GET /{db}/_design/{ddoc}/_view/{view}
@@ -88,6 +89,21 @@ proc parseDesignDocViewResponse*(raw_text: string): DesignDocViewResponse =
   # GET /{db}/_design/{ddoc}/_view/{view}
   let jtext = try: raw_text.parseJson() except: nil
   result = extractDesignDocViewResponse(jtext)
+
+proc extractDesignDocIndexSearchResponse*(jtext: JsonNode): DesignDocIndexSearchResponse =
+  # GET /{db}/_design/{ddoc}/_search/{index}
+  if jtext.isNil: return DesignDocIndexSearchResponse()
+  let fields = jtext.getFields()
+  result = try: DesignDocIndexSearchResponse(
+    rows       : fields.getOrDefault("rows").getElems.extractViewRow,
+    total_rows : fields.getOrDefault("total_rows").getInt,
+    bookmark   : fields.getOrDefault("bookmark ").getStr
+  ) except: DesignDocIndexSearchResponse()
+
+proc parseDesignDocIndexSearchResponse*(raw_text: string): DesignDocIndexSearchResponse =
+  # GET /{db}/_design/{ddoc}/_search/{index}
+  let jtext = try: raw_text.parseJson() except: nil
+  result = extractDesignDocIndexSearchResponse(jtext)
 
 proc extractNewDocumentResponse*(jtext: JsonNode): NewDocumentResponse =
   # PUT /{db}/{docid}
