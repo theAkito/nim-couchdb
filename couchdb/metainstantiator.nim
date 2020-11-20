@@ -20,7 +20,7 @@ func extractDocumentMiniSpec*(jtext: JsonNode, key: string): DocumentMiniSpec =
 proc parseCouchResponseHeaders*(raw_text: string): CouchResponseHeaders =
   raw_text.parseJson.to(CouchResponseHeaders)
 
-proc extractViewIndexSizes*(jtext: JsonNode): ViewIndexSizes =
+func extractViewIndexSizes*(jtext: JsonNode): ViewIndexSizes =
   # GET /{db}/_design/{ddoc}/_info
   if jtext.isNil: return ViewIndexSizes()
   let fields = jtext.getFields()
@@ -30,7 +30,7 @@ proc extractViewIndexSizes*(jtext: JsonNode): ViewIndexSizes =
     external : fields.getOrDefault("external").getInt
   ) except: ViewIndexSizes()
 
-proc extractViewIndex*(jtext: JsonNode): ViewIndex =
+func extractViewIndex*(jtext: JsonNode): ViewIndex =
   # GET /{db}/_design/{ddoc}/_info
   if jtext.isNil: return ViewIndex()
   let fields = jtext.getFields()
@@ -46,7 +46,7 @@ proc extractViewIndex*(jtext: JsonNode): ViewIndex =
     waiting_commit  : fields.getOrDefault("waiting_commit").getBool
   ) except: ViewIndex()
 
-proc extractViewIndexResponse*(jtext: JsonNode): ViewIndexResponse =
+func extractViewIndexResponse*(jtext: JsonNode): ViewIndexResponse =
   # GET /{db}/_design/{ddoc}/_info
   if jtext.isNil: return ViewIndexResponse()
   let fields = jtext.getFields()
@@ -60,7 +60,7 @@ proc parseViewIndexResponse*(raw_text: string): ViewIndexResponse =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractViewIndexResponse(jtext)
 
-proc extractViewRow*(jtext: seq[JsonNode]): seq[ViewRow] =
+func extractViewRow*(jtext: seq[JsonNode]): seq[ViewRow] =
   # GET /{db}/_design/{ddoc}/_view/{view}
   if jtext.len == 0: return @[]
   for jnode in jtext:
@@ -74,7 +74,7 @@ proc extractViewRow*(jtext: seq[JsonNode]): seq[ViewRow] =
     )
   result.filterIt(it != ViewRow())
 
-proc extractDesignDocViewResponse*(jtext: JsonNode): DesignDocViewResponse =
+func extractDesignDocViewResponse*(jtext: JsonNode): DesignDocViewResponse =
   # GET /{db}/_design/{ddoc}/_view/{view}
   if jtext.isNil: return DesignDocViewResponse()
   let fields = jtext.getFields()
@@ -90,7 +90,7 @@ proc parseDesignDocViewResponse*(raw_text: string): DesignDocViewResponse =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractDesignDocViewResponse(jtext)
 
-proc extractDesignDocIndexSearchResponse*(jtext: JsonNode): DesignDocIndexSearchResponse =
+func extractDesignDocIndexSearchResponse*(jtext: JsonNode): DesignDocIndexSearchResponse =
   # GET /{db}/_design/{ddoc}/_search/{index}
   if jtext.isNil: return DesignDocIndexSearchResponse()
   let fields = jtext.getFields()
@@ -105,7 +105,7 @@ proc parseDesignDocIndexSearchResponse*(raw_text: string): DesignDocIndexSearchR
   let jtext = try: raw_text.parseJson() except: nil
   result = extractDesignDocIndexSearchResponse(jtext)
 
-proc extractNewDocumentResponse*(jtext: JsonNode): NewDocumentResponse =
+func extractNewDocumentResponse*(jtext: JsonNode): NewDocumentResponse =
   # PUT /{db}/{docid}
   # PUT /{db}/{docid}/{attname}
   # DELETE /{db}/{docid}/{attname}
@@ -124,7 +124,7 @@ proc parseNewDocumentResponse*(raw_text: string): NewDocumentResponse =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractNewDocumentResponse(jtext)
 
-proc extractRevsDiff*(jtext: JsonNode): RevsDiff =
+func extractRevsDiff*(jtext: JsonNode): RevsDiff =
   # POST /{db}/_revs_diff
   let emptyTable = { "": RevsDiffEntity() }.toOrderedTable
   if jtext.isNil: return RevsDiff( emptyTable )
@@ -137,7 +137,7 @@ proc parseRevsDiff*(raw_text: string): RevsDiff =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractRevsDiff(jtext)
 
-proc extractMissingRevs*(jtext: JsonNode): MissingRevs =
+func extractMissingRevs*(jtext: JsonNode): MissingRevs =
   # /db/_purge
   if jtext.isNil: return MissingRevs()
   result = try: MissingRevs(
@@ -149,7 +149,7 @@ proc parseMissingRevs*(raw_text: string): MissingRevs =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractMissingRevs(jtext)
 
-proc extractPurgeResponse*(jtext: JsonNode): PurgeResponse =
+func extractPurgeResponse*(jtext: JsonNode): PurgeResponse =
   # /db/_purge
   if jtext.isNil: return PurgeResponse()
   result = try: PurgeResponse(
@@ -162,11 +162,11 @@ proc parsePurgeResponse*(raw_text: string): PurgeResponse =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractPurgeResponse(jtext)
 
-proc parsePurgedInfosLimit*(raw_text: string): PurgedInfosLimit =
+func parsePurgedInfosLimit*(raw_text: string): PurgedInfosLimit =
   # PUT /{db}/_purged_infos_limit
   result = PurgedInfosLimit(try: raw_text.parseInt except: -127)
 
-proc extractNewIndexResult*(jtext: JsonNode): NewIndexResult =
+func extractNewIndexResult*(jtext: JsonNode): NewIndexResult =
   # /db/_index
   if jtext.isNil: return NewIndexResult()
   result = try: NewIndexResult(
@@ -180,7 +180,7 @@ proc parseNewIndexResult*(raw_text: string): NewIndexResult =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractNewIndexResult(jtext)
 
-proc extractUsers*(jtext: JsonNode): (Admins, Members) =
+func extractUsers*(jtext: JsonNode): (Admins, Members) =
   # /{db}/_security
   if jtext.isNil: return (Admins(), Members())
   let
@@ -206,7 +206,7 @@ proc parseUsers*(raw_text: string): (Admins, Members) =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractUsers(jtext)
 
-proc extractSimpleConfirmation*(jtext: JsonNode): SimpleConfirmation =
+func extractSimpleConfirmation*(jtext: JsonNode): SimpleConfirmation =
   # /db/_compact
   # /db/_compact/design-doc
   # /db/_view_cleanup
@@ -224,22 +224,7 @@ proc parseSimpleConfirmation*(raw_text: string): SimpleConfirmation =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractSimpleConfirmation(jtext)
 
-proc parseDocChangesResponse*(raw_text: string): DocChangesResponse =
-  raw_text.parseJson.to(DocChangesResponse)
-
-proc parseDocChangesQuery*(raw_text: string): DocChangesQuery =
-  raw_text.parseJson.to(DocChangesQuery)
-
-proc parseSyncShardsResponse*(raw_text: string): SyncShardsResponse =
-  raw_text.parseJson.to(SyncShardsResponse)
-
-proc parseDocShardResponse*(raw_text: string): DocShardResponse =
-  raw_text.parseJson.to(DocShardResponse)
-
-proc parseDatabaseShards*(raw_text: string): DatabaseShards =
-  raw_text.parseJson.to(DatabaseShards)
-
-proc extractExplainIndexResult*(jtext: JsonNode): ExplainIndexResult =
+func extractExplainIndexResult*(jtext: JsonNode): ExplainIndexResult =
   # /db/_explain
   if jtext.isNil: return ExplainIndexResult()
   result = ExplainIndexResult(
@@ -258,17 +243,11 @@ proc parseExplainIndexResult*(raw_text: string): ExplainIndexResult =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractExplainIndexResult(jtext)
 
-proc extractUpdatedDocuments*(jtext: JsonNode): seq[UpdatedDocument] =
+func extractUpdatedDocuments*(jtext: JsonNode): seq[UpdatedDocument] =
   # /{db}/_bulk_docs
   if jtext.isNil: return @[]
   for doc in jtext.elems:
-    var upDocOk: bool
-    try:
-      upDocOk = doc["ok"].getBool()
-    except KeyError:
-      return @[]
-    except:
-      echo getCurrentExceptionMsg()
+    let upDocOk = doc.getOrDefault("ok").getBool()
     if upDocOk:
       result.add(
         UpdatedDocument(
@@ -292,10 +271,7 @@ proc parseUpdatedDocuments*(raw_text: string): seq[UpdatedDocument] =
   let jtext = try: raw_text.parseJson() except: nil
   result = extractUpdatedDocuments(jtext)
 
-proc parseSearchedEntity*(raw_text: string): SearchedEntity =
-  raw_text.parseJson.to(SearchedEntity)
-
-proc extractFoundDocuments*(jtext: JsonNode): FoundDocuments =
+func extractFoundDocuments*(jtext: JsonNode): FoundDocuments =
   if jtext.isNil: return FoundDocuments()
   let
     docs = try: jtext["docs"].elems except: @[]
@@ -313,28 +289,6 @@ proc extractFoundDocuments*(jtext: JsonNode): FoundDocuments =
     execution_stats   : exec_stats,
     bookmark          : jtext.getOrDefault("bookmark").getStr(">>none<<")
   )
-
-proc parseFoundDocuments*(raw_text: string, fields: seq[string]): FoundDocuments =
-  let jtext = try: raw_text.parseJson() except: nil
-  result = extractFoundDocuments(jtext)
-
-proc parseWantedDocument*(raw_text: string): WantedDocument =
-  raw_text.parseJson.to(WantedDocument)
-
-proc parseWantedDocuments*(raw_text: string): WantedDocuments =
-  raw_text.parseJson.to(WantedDocuments)
-
-proc parseDocRevisions*(raw_text: string): DocRevisions =
-  raw_text.parseJson.to(DocRevisions)
-
-proc parseDocOk*(raw_text: string): DocOk =
-  raw_text.parseJson.to(DocOk)
-
-proc parseDocErr*(raw_text: string): DocErr =
-  raw_text.parseJson.to(DocErr)
-
-proc parseDocumentEntity*(raw_text: string): DocumentEntity =
-  raw_text.parseJson.to(DocumentEntity)
 
 func extractDocumentResult*(jtext: JsonNode): DocumentResult =
   # /{db}/_bulk_get
