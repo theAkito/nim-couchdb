@@ -292,7 +292,7 @@ func extractFoundDocuments*(jtext: JsonNode): FoundDocuments =
   )
 
 func extractDocumentResult*(jtext: JsonNode): DocumentResult =
-  # /{db}/_bulk_get
+  # POST /{db}/_bulk_get
   if jtext.isNil: return DocumentResult()
   if jtext["docs"].elems[0].fields.hasKey("ok"):
     let
@@ -336,12 +336,12 @@ func extractDocumentResult*(jtext: JsonNode): DocumentResult =
     return DocumentResult()
 
 proc parseDocumentResult*(raw_text: string): DocumentResult =
-  # /{db}/_bulk_get
+  # POST /{db}/_bulk_get
   let jtext = try: raw_text.parseJson() except: nil
   result = extractDocumentResult(jtext)
 
 proc parseDocumentResults*(raw_text: string): DocumentResults =
-  # /{db}/_bulk_get
+  # POST /{db}/_bulk_get
   for res in raw_text.parseJson().elems:
     result = result & extractDocumentResult(res)
 

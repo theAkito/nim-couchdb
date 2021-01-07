@@ -17,23 +17,23 @@ template adjustClient(): untyped =
 
 proc reqGet(http: HttpClient, url, req_kind: string): bool =
   adjustClient()
-  if http.get(url & req_kind).status == resp_ok: result = true
+  http.get(url & req_kind).status == resp_ok
 
 proc reqPost(http: HttpClient, url, req_kind, body: string): bool =
   adjustClient()
-  if http.post(url & req_kind, body).status == resp_ok: result = true
+  http.post(url & req_kind, body).status == resp_ok
 
 proc reqPut(http: HttpClient, url, req_kind, body: string): bool =
   adjustClient()
-  if http.put(url & req_kind, body).status == resp_ok: result = true
+  http.put(url & req_kind, body).status == resp_ok
 
 proc reqDelete(http: HttpClient, url, req_kind: string): bool =
   adjustClient()
-  if http.delete(url & req_kind).status == resp_ok: result = true
+  http.delete(url & req_kind).status == resp_ok
 
 proc reqHead(http: HttpClient, url, req_kind: string): bool =
   adjustClient()
-  if http.head(url & req_kind).status == resp_ok: result = true
+  http.head(url & req_kind).status == resp_ok
 
 proc getDbAllDocs(http: HttpClient, db, url, req_kind: string): bool =
   http.reqGet(url & req_sep & db, req_db_all_docs)
@@ -41,8 +41,12 @@ proc getDbAllDocs(http: HttpClient, db, url, req_kind: string): bool =
 proc getDbAllDesignDocs(http: HttpClient, db, url, req_kind: string): bool =
   http.reqGet(url & req_sep & db, req_db_design_docs)
 
-proc getDbBulkDocs(http: HttpClient, db, url, req_kind: string, docs: WantedDocuments): bool =
-  http.reqPost(url & req_sep & db, req_db_bulk_get, docs.toJtext)
+proc getDbBulkDocs*(http: HttpClient, db, url, req_kind: string, docs: WantedDocuments): DocumentResults =
+  let response = http.post(url & req_sep & db & req_kind, docs.toJtext)
+  if response.status == resp_ok:
+    result = response.body.parseDocumentResults()
+  else:
+    result = DocumentResults(@[])
 
 when mode_debug:
   echo WantedDocuments(
